@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Automated WAQI data collection for AirLens project",
   "scripts": {
+    "dev": "python3 -m http.server 3000 --directory app",
+    "start": "npm run dev",
     "fetch:waqi": "node scripts/fetch-waqi-data.js",
     "test": "echo \"No tests yet\""
   },

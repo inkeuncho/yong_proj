@@ -122,7 +122,11 @@ class PolicyGlobe {
       this.createCountryBorders();
 
       await this.loadPM25Data();
-      
+
+      // 🆕 전역 데이터 서비스에 PM2.5 데이터 업데이트 (전체 페이지 연동)
+      this.globalDataService.setStations(this.pm25Data);
+      console.log(`✅ Updated global data service with ${this.pm25Data.size} stations`);
+
       // 🆕 PM2.5 마커 생성
       console.log(`📍 Creating PM2.5 markers from ${this.pm25Data.size} stations...`);
       let pm25Count = 0;
@@ -171,6 +175,10 @@ class PolicyGlobe {
         pm25GroupChildren: this.markerSystem.markerGroups.pm25.children.length,
         policiesGroupChildren: this.markerSystem.markerGroups.policies.children.length
       });
+
+      // 🆕 전역 데이터 서비스에 정책 데이터 업데이트 (전체 페이지 연동)
+      this.globalDataService.setPolicies(policyMap);
+      console.log(`✅ Updated global data service with ${policyMap.size} policies`);
 
       // Load policy impact data from JSON files
       this.policyImpactData = await this.loadPolicyImpactData();
@@ -271,40 +279,62 @@ class PolicyGlobe {
   }
 
   async createRealisticEarth() {
-    const geometry = new THREE.SphereGeometry(1, 128, 128);
+    const geometry = new THREE.SphereGeometry(1, 64, 64);
 
     console.log('🌍 Loading REAL Earth textures from NASA...');
 
     // Load REAL Earth textures from NASA Blue Marble
     const textureLoader = new THREE.TextureLoader();
+    // 텍스처 캐싱 활성화
+    THREE.Cache.enabled = true;
 
     try {
       // Use NASA's Blue Marble Next Generation (free, no API key)
-      // High-resolution 8K Earth texture from NASA
+      // Optimized: Lower resolution for faster loading
       const earthTexture = await new Promise((resolve, reject) => {
-        textureLoader.load(
-          // NASA's visible Earth image (Blue Marble)
+        // Try multiple sources in parallel
+        const sources = [
+          // Lower resolution version (2K instead of 8K)
+          'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
           'https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg',
-          (texture) => {
-            console.log('✅ NASA Earth texture loaded successfully');
-            resolve(texture);
-          },
-          undefined,
-          (error) => {
-            console.warn('⚠️ NASA texture failed, using fallback...');
-            // Fallback to another free Earth texture
-            textureLoader.load(
-              'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-              resolve,
-              undefined,
-              () => {
-                console.warn('⚠️ All external textures failed, using procedural...');
-                // Final fallback: procedural texture
-                resolve(this.createProceduralEarthTexture());
-              }
-            );
+        ];
+
+        let attempted = 0;
+        let maxAttempts = sources.length;
+
+        const tryNextSource = () => {
+          if (attempted >= maxAttempts) {
+            console.warn('⚠️ All external textures failed, using procedural...');
+            resolve(this.createProceduralEarthTexture());
+            return;
           }
-        );
+
+          const source = sources[attempted];
+          attempted++;
+
+          console.log(`📥 Loading Earth texture (${attempted}/${maxAttempts}): ${source.substring(0, 50)}...`);
+
+          textureLoader.load(
+            source,
+            (texture) => {
+              console.log('✅ Earth texture loaded successfully');
+              // Optimize texture
+              texture.magFilter = THREE.LinearFilter;
+              texture.minFilter = THREE.LinearMipmapLinearFilter;
+              resolve(texture);
+            },
+            (progress) => {
+              const percent = (progress.loaded / progress.total * 100).toFixed(0);
+              console.log(`  Loading: ${percent}%`);
+            },
+            () => {
+              console.warn(`⚠️ Failed to load from ${source.substring(0, 50)}..., trying next...`);
+              tryNextSource();
+            }
+          );
+        };
+
+        tryNextSource();
       });
 
       const material = new THREE.MeshPhongMaterial({
@@ -482,8 +512,54 @@ class PolicyGlobe {
   }
 
   createAtmosphere() {
-    const geometry = new THREE.SphereGeometry(1.12, 128, 128);
-    const material = new THREE.ShaderMaterial({
+    // Inner atmosphere layer
+    const geometryInner = new THREE.SphereGeometry(1.08, 64, 64);
+    const materialInner = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 }
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vPosition = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        uniform float time;
+
+        void main() {
+          // 기본 대기 글로우
+          float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+
+          // 시간에 따른 미묘한 색상 변화
+          float colorShift = sin(time * 0.3) * 0.1;
+
+          vec3 atmosphereColor = mix(
+            vec3(0.15, 0.45, 0.95),  // 파란색
+            vec3(0.2, 0.6, 1.0),      // 밝은 파란색
+            0.5 + colorShift
+          );
+
+          gl_FragColor = vec4(atmosphereColor * intensity, intensity * 0.8);
+        }
+      `,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true
+    });
+
+    this.atmosphere = new THREE.Mesh(geometryInner, materialInner);
+    this.atmosphereMaterial = materialInner;
+    this.scene.add(this.atmosphere);
+
+    // Outer atmosphere layer (glow effect)
+    const geometryOuter = new THREE.SphereGeometry(1.15, 64, 64);
+    const materialOuter = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
         void main() {
@@ -494,8 +570,8 @@ class PolicyGlobe {
       fragmentShader: `
         varying vec3 vNormal;
         void main() {
-          float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-          gl_FragColor = vec4(0.15, 0.45, 0.95, 1.0) * intensity;
+          float intensity = pow(0.8 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
+          gl_FragColor = vec4(0.1, 0.3, 0.7, 1.0) * intensity * 0.3;
         }
       `,
       blending: THREE.AdditiveBlending,
@@ -503,34 +579,44 @@ class PolicyGlobe {
       transparent: true
     });
 
-    this.atmosphere = new THREE.Mesh(geometry, material);
-    this.scene.add(this.atmosphere);
+    const atmosphereOuter = new THREE.Mesh(geometryOuter, materialOuter);
+    this.scene.add(atmosphereOuter);
   }
 
   createClouds() {
-    const geometry = new THREE.SphereGeometry(1.01, 128, 128);
+    const geometry = new THREE.SphereGeometry(1.01, 64, 64);
 
     const canvas = document.createElement('canvas');
     canvas.width = 2048;
     canvas.height = 1024;
     const ctx = canvas.getContext('2d');
 
+    // Clear canvas
     ctx.fillStyle = 'rgba(0, 0, 0, 0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-    for (let i = 0; i < 180; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      const radius = Math.random() * 35 + 18;
-      const opacity = 0.15 + Math.random() * 0.25;
+    // Create cloud pattern using multiple layers
+    const cloudLayers = [
+      { count: 200, minRadius: 15, maxRadius: 40, opacity: 0.15 },
+      { count: 150, minRadius: 20, maxRadius: 50, opacity: 0.1 },
+      { count: 100, minRadius: 25, maxRadius: 60, opacity: 0.08 }
+    ];
 
-      ctx.globalAlpha = opacity;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
+    for (const layer of cloudLayers) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      for (let i = 0; i < layer.count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * (layer.maxRadius - layer.minRadius) + layer.minRadius;
+        const opacity = layer.opacity + Math.random() * 0.1;
 
-      if (Math.random() > 0.6) {
+        ctx.globalAlpha = opacity;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Add secondary cloud puff
+        if (Math.random() > 0.5) {
         ctx.beginPath();
         ctx.arc(x + radius * 0.6, y, radius * 0.7, 0, Math.PI * 2);
         ctx.fill();
@@ -3320,8 +3406,13 @@ class PolicyGlobe {
     if (this.clouds) this.clouds.rotation.y += 0.00015;
     if (this.stars) this.stars.rotation.y += 0.00001;
 
+    // Update atmosphere shader time uniform
+    if (this.atmosphereMaterial) {
+      this.atmosphereMaterial.uniforms.time.value = this.time * 0.001;
+    }
+
     this.updateParticles();
-    
+
     // 🆕 Enhanced Marker System 애니메이션 업데이트
     if (this.markerSystem) {
       this.markerSystem.updateAll(delta);
@@ -3452,7 +3543,7 @@ class PolicyGlobe {
 
       if (stations.length > 0) {
         const avgPM25 = stations.reduce((sum, s) => sum + (s.pm25 || 0), 0) / stations.length;
-        document.getElementById('policy-pm25').textContent = 
+        document.getElementById('policy-pm25').textContent =
           (Math.round(avgPM25 * 10) / 10).toFixed(1);
         document.getElementById('policy-aqi').textContent = this.getAQIStatus(avgPM25);
       } else {
@@ -3460,10 +3551,124 @@ class PolicyGlobe {
         document.getElementById('policy-aqi').textContent = '-';
       }
 
+      // ✨ 정책 효과도 표시
+      if (policy.effectivenessScore) {
+        const effectiveness = Math.round(policy.effectivenessScore * 100);
+        document.getElementById('policy-effectiveness-percent').textContent = effectiveness + '%';
+        document.getElementById('policy-effectiveness-bar').style.width = effectiveness + '%';
+
+        let status = '';
+        if (effectiveness >= 80) status = 'Very Effective ✓';
+        else if (effectiveness >= 60) status = 'Effective';
+        else if (effectiveness >= 40) status = 'Moderate Impact';
+        else status = 'Limited Impact';
+        document.getElementById('policy-effectiveness-status').textContent = status;
+      }
+
+      // ✨ 정책 영향 데이터 표시
+      const impactSection = document.getElementById('policy-impact-section');
+      if (this.policyImpactData && this.policyImpactData[countryName]) {
+        const impactData = this.policyImpactData[countryName];
+
+        if (impactData.pm25_before !== undefined && impactData.pm25_after !== undefined) {
+          impactSection.style.display = 'block';
+
+          const before = impactData.pm25_before;
+          const after = impactData.pm25_after;
+          const change = after - before;
+          const changePercent = ((change / before) * 100).toFixed(1);
+
+          // 데이터 표시
+          document.getElementById('impact-before').textContent = before.toFixed(1);
+          document.getElementById('impact-after').textContent = after.toFixed(1);
+
+          const changeText = change < 0
+            ? `↓ ${Math.abs(change).toFixed(1)} (${changePercent}%)`
+            : `↑ ${change.toFixed(1)} (${changePercent}%)`;
+          const changeElement = document.getElementById('impact-change');
+          changeElement.textContent = changeText;
+          changeElement.style.color = change < 0 ? '#51cf66' : '#ff6b6b';
+
+          // 통계 분석
+          const significance = impactData.statistical_significance || 'Data analysis';
+          document.getElementById('impact-significance').textContent = significance;
+
+          // 차트 그리기
+          this.drawPolicyImpactChart(before, after, countryName);
+        } else {
+          impactSection.style.display = 'none';
+        }
+      } else {
+        impactSection.style.display = 'none';
+      }
+
       policyCard.style.display = 'block';
       policyCard.classList.add('show');
     } catch (error) {
       console.error('❌ Error displaying country policy:', error);
+    }
+  }
+
+  // 🆕 정책 영향 차트 그리기
+  drawPolicyImpactChart(before, after, country) {
+    try {
+      const ctx = document.getElementById('policy-impact-chart');
+      if (!ctx) return;
+
+      // 기존 차트 제거
+      if (window.policyImpactChart) {
+        window.policyImpactChart.destroy();
+      }
+
+      window.policyImpactChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Before', 'After'],
+          datasets: [{
+            label: 'PM2.5 Level (µg/m³)',
+            data: [before, after],
+            backgroundColor: [
+              'rgba(255, 107, 107, 0.8)',
+              'rgba(81, 207, 102, 0.8)'
+            ],
+            borderColor: [
+              'rgb(255, 107, 107)',
+              'rgb(81, 207, 102)'
+            ],
+            borderWidth: 1,
+            borderRadius: 4,
+            barThickness: 30
+          }]
+        },
+        options: {
+          indexAxis: 'x',
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: Math.max(before, after) * 1.2,
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)',
+                font: { size: 10 }
+              },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            x: {
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)',
+                font: { size: 10 }
+              },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error drawing policy impact chart:', error);
     }
   }
 

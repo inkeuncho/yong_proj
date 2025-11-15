@@ -55,72 +55,67 @@ export class EnhancedMarkerSystem {
    */
   createPM25Marker(data) {
     const { id, latitude, longitude, pm25, country } = data;
-    
-    // 마커 크기 (매우 작음)
-    const markerRadius = 0.01;
-    
+
     // ================================
-    // 1️⃣ 메인 구체 (배경 역할)
+    // 점에서 빛나는 효과 (Glowing Dot Style)
     // ================================
-    const sphereGeometry = new THREE.SphereGeometry(markerRadius, 16, 16);
+    const markerRadius = 0.008;
     const color = this.getPM25Color(pm25);
+
+    // 1️⃣ 메인 구체 (중심 점)
+    const sphereGeometry = new THREE.SphereGeometry(markerRadius, 12, 12);
     const sphereMaterial = new THREE.MeshStandardMaterial({
       color: color,
-      metalness: 0.3,
-      roughness: 0.6,
+      metalness: 0.8,
+      roughness: 0.2,
       emissive: color,
-      emissiveIntensity: 0.2,
+      emissiveIntensity: 0.8,
       wireframe: false,
-      opacity: 0.6,
-      transparent: true
+      opacity: 1,
+      transparent: false
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.userData = { type: 'pm25', id, pm25, country };
-    
-    // ================================
-    // 2️⃣ 펄싱 링 (약한 효과)
-    // ================================
-    const ringGeometry = new THREE.TorusGeometry(markerRadius * 1.3, markerRadius * 0.2, 16, 100);
-    const ringMaterial = new THREE.MeshStandardMaterial({
+
+    // 2️⃣ 글로우 구 (빛나는 아우라)
+    const glowGeometry = new THREE.SphereGeometry(markerRadius * 1.5, 12, 12);
+    const glowMaterial = new THREE.MeshBasicMaterial({
       color: color,
-      metalness: 0.5,
-      roughness: 0.3,
-      emissive: color,
-      emissiveIntensity: 0.15,
-      opacity: 0.4,
+      opacity: 0.3,
       transparent: true
     });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-    
+    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+
     // ================================
     // 그룹 생성
     // ================================
     const markerGroup = new THREE.Group();
     markerGroup.add(sphere);
-    markerGroup.add(ring);
-    
+    markerGroup.add(glowMesh);
+    markerGroup.add(light);
+
     // 위치 설정 (지구 표면)
     const position = this.latLonToPosition(latitude, longitude);
     markerGroup.position.copy(position);
-    
+
     // 지구를 향하게 회전
     markerGroup.lookAt(this.earth.position.clone().add(position));
-    
+
     // 그룹에 추가
     this.markerGroups.pm25.add(markerGroup);
-    
+
     // 저장
     this.pm25Markers.set(id, {
       group: markerGroup,
       sphere: sphere,
-      ring: ring,
+      glow: glowMesh,
+      light: light,
       data: data,
       time: 0,
       sphereMaterial: sphereMaterial,
-      ringMaterial: ringMaterial
+      glowMaterial: glowMaterial
     });
-    
+
     return markerGroup;
   }
 
@@ -309,20 +304,20 @@ export class EnhancedMarkerSystem {
   updatePM25Marker(id, deltaTime = 0.016) {
     const marker = this.pm25Markers.get(id);
     if (!marker) return;
-    
+
     // 시간 누적
     marker.time += deltaTime;
-    
-    // ✨ 펄싱 애니메이션 (0.8 ~ 1.2 스케일)
-    const pulseScale = 1.0 + Math.sin(marker.time * 3) * 0.2;
-    marker.ring.scale.set(pulseScale, pulseScale, pulseScale);
-    
-    // 회전 (느린 속도)
-    marker.ring.rotation.z += deltaTime * 0.5;
-    
-    // 투명도 변화 (호흡 효과)
-    const opacity = 0.4 + Math.cos(marker.time * 2) * 0.2;
-    marker.ringMaterial.opacity = opacity;
+
+    // ✨ 글로우 스케일 변화 (펄싱 효과)
+    const glowScale = 1.4 + Math.sin(marker.time * 2.5) * 0.3;
+    marker.glow.scale.set(glowScale, glowScale, glowScale);
+
+    // 글로우 투명도 변화
+    const glowOpacity = 0.2 + Math.sin(marker.time * 2.5) * 0.15;
+    marker.glowMaterial.opacity = glowOpacity;
+
+    // 빛의 세기 변화
+    marker.light.intensity = 0.4 + Math.sin(marker.time * 2) * 0.3;
   }
 
   /**
