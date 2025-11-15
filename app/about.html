@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AirLens - About & Contact</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link rel="stylesheet" href="css/main.css"/>
+<link rel="stylesheet" href="css/settings.css"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25e2f4",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#102122",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark">
+    <!-- Dark Mode Toggle Button -->
+    <div class="theme-toggle-container">
+        <div class="toggle-cont">
+            <input class="toggle-input" id="theme-toggle" name="toggle" type="checkbox" />
+            <label class="toggle-label" for="theme-toggle">
+                <div class="cont-icon">
+                    <span style="--sparkle-width: 2; --sparkle-deg: 25; --sparkle-duration: 11" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 100; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 280; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 200; --sparkle-duration: 3" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 30; --sparkle-duration: 20" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 300; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 250; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 210; --sparkle-duration: 8" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 100; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 15; --sparkle-duration: 13" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 75; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 6" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 50; --sparkle-duration: 7" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 320; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 220; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 215; --sparkle-duration: 2" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 135; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 45; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 78; --sparkle-duration: 16" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 89; --sparkle-duration: 19" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 14" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 97; --sparkle-duration: 1" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 174; --sparkle-duration: 10" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 236; --sparkle-duration: 5" class="sparkle"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="icon">
+                        <path d="M0.96233 28.61C1.36043 29.0081 1.96007 29.1255 2.47555 28.8971L10.4256 25.3552C13.2236 24.11 16.4254 24.1425 19.2107 25.4401L27.4152 29.2747C27.476 29.3044 27.5418 29.3023 27.6047 29.32C27.6563 29.3348 27.7079 29.3497 27.761 29.3574C27.843 29.3687 27.9194 29.3758 28 29.3688C28.1273 29.3617 28.2531 29.3405 28.3726 29.2945C28.4447 29.262 28.5162 29.2287 28.5749 29.1842C28.6399 29.1446 28.6993 29.0994 28.7509 29.0477L28.9008 28.8582C28.9468 28.7995 28.9793 28.7274 29.0112 28.656C29.0599 28.5322 29.0811 28.4036 29.0882 28.2734C29.0939 28.1957 29.0868 28.1207 29.0769 28.0415C29.0705 27.9955 29.0585 27.9524 29.0472 27.9072C29.0295 27.8343 29.0302 27.7601 28.9984 27.6901L25.1638 19.4855C23.8592 16.7073 23.8273 13.5048 25.0726 10.7068L28.6145 2.75679C28.8429 2.24131 28.7318 1.63531 28.3337 1.2372C27.9165 0.820011 27.271 0.721743 26.7491 0.9961L19.8357 4.59596C16.8418 6.15442 13.2879 6.18696 10.2615 4.70062L1.80308 0.520214C1.7055 0.474959 1.60722 0.441742 1.50964 0.421943C1.44459 0.409215 1.37882 0.395769 1.3074 0.402133C1.14406 0.395769 0.981436 0.428275 0.818095 0.499692C0.77284 0.519491 0.719805 0.545671 0.67455 0.578198C0.596061 0.617088 0.524653 0.675786 0.4596 0.74084C0.394546 0.805894 0.335843 0.877306 0.296245 0.956502C0.263718 1.00176 0.237561 1.05477 0.217762 1.10003C0.152708 1.24286 0.126545 1.40058 0.120181 1.54978C0.120181 1.61483 0.126527 1.6735 0.132891 1.73219C0.15269 1.85664 0.178881 1.97332 0.237571 2.08434L4.41798 10.5427C5.91139 13.5621 5.8725 17.1238 4.3204 20.1099L0.720514 27.0233C0.440499 27.5536 0.545137 28.1928 0.96233 28.61Z" />
+                    </svg>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">AirLens</a>
+            <button class="navbar-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="globe.html" class="navbar-link">Globe</a></li>
+                <li><a href="camera.html" class="navbar-link">Camera AI</a></li>
+                <li><a href="research.html" class="navbar-link">Research</a></li>
+                <li><a href="about.html" class="navbar-link navbar-link-active">About</a></li>
+                <li><a href="settings.html" class="navbar-link">
+                    <div class="settings-icon">
+                        <div class="loader-icon"></div>
+                    </div>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<!-- ProfileHeader -->
+<div class="flex p-4 mt-8 @container">
+<div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+<div class="flex items-center gap-6">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAfFClQPMdnDcsj1SFs2utbvu5HYWZ0GCxAOVOvdPnbkvEQpYpk8-n9e5sA5IYprX8aOXBF9Bq_9iN_48y1dMBwPcxJWD18C4zgE1dHm-wh3IGHTFrTSX7TwdJd9mcPnn6TjunPERKqmwZxgvkG6va81zBuUuBRdnVau_G77u6oUaVMM3ylPvM0LAuoiKK-8NFer0cS7-El-HcXzaXBD6ZSD4CYL0nkIC29cZp_PCwH-UyHacTelsrGoSsM2S8mE988ozyJPJ_5QpI");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-[28px] font-bold leading-tight tracking-[-0.015em]">AirLens Team</p>
+<p class="text-gray-600 dark:text-gray-400 text-lg font-normal leading-normal">Data Science & Environmental Tech</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card -->
+<div class="p-4 @container mt-4">
+<div class="flex flex-col items-stretch justify-start rounded-lg @xl:flex-row @xl:items-start gap-4 @xl:gap-8">
+<div class="w-full @xl:w-2/5 shrink-0 bg-center bg-no-repeat aspect-square @xl:aspect-auto @xl:h-full bg-cover rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCHbPx0l5FLHMahkgXc54OjpnGXe2DiEfqXIz14COAI4J2Pcs5fjzs6X_c8gMUDDWSDd1Hn7Mzmi1mS7m0skNPuSIJBiQps0ZOO-T2oZU6aYTNk9w2dsx602WX2Xu5zzFwJCKc4uDJkYb01o9uy6V0-_Hyikl0UjdnDbmW8FdxLe1panALpIWC0S36dFXA7CLYq9BXz0tfW8HRp286xsVQ0xu8fhZ_MVYaCKCNZSYRGfV-Ks4Sr7izpanV0GjMjCCIstFiS9c3-No8");'></div>
+<div class="flex w-full grow flex-col items-stretch justify-center gap-1 py-4">
+<p class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">About the Project</p>
+<div class="flex items-end gap-3 justify-between">
+<p class="text-gray-700 dark:text-gray-300 text-base font-normal leading-relaxed mt-2">
+                    AirLens was created to democratize access to air quality information through innovative use of machine learning and verified historical data visualization. We believe everyone deserves to know the air they breathe, regardless of their location or technical expertise.
+                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- SectionHeader -->
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-10">Technologies & Skills</h2>
+<!-- TextGrid -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">TensorFlow.js</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Machine Learning</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">code</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">Python</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Data Science</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">language</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">JavaScript</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Frontend</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">view_in_ar</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">Three.js</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">3D Visualization</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">insert_chart</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">Chart.js</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Data Visualization</p>
+</div>
+</div>
+<div class="flex flex-1 gap-3 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-4 flex-col">
+<span class="material-symbols-outlined text-primary text-3xl">cloud</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-gray-900 dark:text-white text-base font-bold leading-tight">APIs</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Data Integration</p>
+</div>
+</div>
+</div>
+<!-- Contact Form Section -->
+<div class="w-full px-4 pt-10">
+<div class="flex flex-col gap-6 rounded-lg border border-gray-200/80 dark:border-white/10 bg-white/50 dark:bg-white/5 p-6 sm:p-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Get In Touch</h2>
+<p class="text-gray-600 dark:text-gray-400 text-base font-normal leading-normal">Feel free to reach out with any questions or collaboration ideas.</p>
+</div>
+<!-- To enable the contact form:
+     1. Sign up at https://formspree.io (free)
+     2. Create a new form
+     3. Replace YOUR_FORM_ID below with your actual form ID
+     4. Example: https://formspree.io/f/xvoepzrj
+-->
+<form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="flex flex-col gap-4" onsubmit="if(this.action.includes('YOUR_FORM_ID')){alert('Please configure Formspree form ID in about.html. See source code for instructions.'); return false;}">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="name">Name</label>
+<input class="w-full rounded-md border-gray-300 dark:border-white/20 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="name" name="name" placeholder="Your Name" type="text" required/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="email">Email</label>
+<input class="w-full rounded-md border-gray-300 dark:border-white/20 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="email" name="email" placeholder="your.email@example.com" type="email" required/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="message">Message</label>
+<textarea class="w-full rounded-md border-gray-300 dark:border-white/20 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="message" name="message" placeholder="Your message here..." rows="4" required></textarea>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-xs text-gray-500 dark:text-gray-400">Contact: joymin5655@gmail.com</p>
+<button class="flex min-w-[120px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-gray-900 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark transition-opacity" type="submit">
+<span class="truncate">Send Message</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer style="background: var(--color-bg-dark); color: var(--color-text-dark); padding: var(--space-5) 0;">
+    <div class="container text-center">
+        <p style="color: var(--color-text-dark-secondary);">
+            © 2025 AirLens. Built with ❤️ for a cleaner planet.
+        </p>
+        <p style="color: var(--color-text-dark-secondary); font-size: var(--text-sm); margin-top: var(--space-4);">
+            <a href="https://github.com/joymin5655/Finedust_proj" style="color: var(--color-primary);" target="_blank">
+                View on GitHub
+            </a>
+        </p>
+    </div>
+</footer>
+<script src="js/theme-toggle.js"></script>
+<script src="js/message-utils.js"></script>
+<script src="js/main.js"></script>
+<script>
+// 다크모드 자동 적용
+const html = document.documentElement;
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+    html.classList.add('dark');
+}
+</script>
+</body>
+</html>

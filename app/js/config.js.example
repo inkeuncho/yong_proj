@@ -1,0 +1,24 @@
+/**
+ * API Configuration Template
+ * 
+ * INSTRUCTIONS:
+ * 1. Copy this file to js/config.js
+ * 2. Replace 'YOUR_TOKEN_HERE' with your actual API tokens
+ * 3. js/config.js is in .gitignore and will never be committed
+ */
+
+const API_CONFIG = {
+    WAQI: {
+        token: 'YOUR_WAQI_TOKEN_HERE',  // Get from: https://aqicn.org/data-platform/token
+        enabled: false
+    },
+    OPENWEATHER: {
+        apiKey: 'YOUR_OPENWEATHER_KEY_HERE',  // Get from: https://openweathermap.org/api
+        enabled: false
+    }
+};
+
+// Export for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = API_CONFIG;
+}

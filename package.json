@@ -1,0 +1,24 @@
+{
+  "name": "airlens-data-collector",
+  "version": "1.0.0",
+  "description": "Automated WAQI data collection for AirLens project",
+  "scripts": {
+    "fetch:waqi": "node scripts/fetch-waqi-data.js",
+    "test": "echo \"No tests yet\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joymin5655/Finedust_proj.git"
+  },
+  "keywords": [
+    "air-quality",
+    "waqi",
+    "pm25",
+    "environmental-data"
+  ],
+  "author": "AirLens Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

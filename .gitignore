@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Environment
+.env
+.env.local
+
+# API Configuration (contains sensitive API keys)
+app/js/config.js
+
+# Temporary files
+*.tmp
+.cache/
+
+# Archives
+archive/
+
+# API tokens (never commit!)
+*.token
+
+# Data collection logs
+scripts/*.log
+app/js/config.js

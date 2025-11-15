@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Explore real-time PM2.5 levels on an interactive 3D globe. 174+ cities with official EU Copernicus CAMS data. Visualize country policy impacts on air quality.">
+    <meta name="keywords" content="3D globe, air quality map, PM2.5 visualization, global pollution, Three.js, environmental data">
+    <meta name="author" content="AirLens Team">
+    <meta name="theme-color" content="#25e2f4">
+    <title>Interactive Globe - Real-Time PM2.5 Visualization | AirLens</title>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://joymin5655.github.io/Finedust_proj/globe.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://joymin5655.github.io/Finedust_proj/globe.html">
+    <meta property="og:title" content="Interactive 3D Globe - PM2.5 Visualization | AirLens">
+    <meta property="og:description" content="Explore air quality worldwide on an interactive 3D globe. Real-time PM2.5 data from 174+ cities with country policy impacts.">
+    <!-- <meta property="og:image" content="https://joymin5655.github.io/Finedust_proj/assets/images/globe-og.png"> -->
+
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://api.open-meteo.com">
+    <link rel="dns-prefetch" href="https://aqicn.org">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="css/settings.css"/>
+    <link rel="stylesheet" href="css/policy-panel-enhanced.css"/>
+
+    <!-- Enhanced Policy System Styles -->
+    <style>
+        /* 정책 툴팁 스타일 */
+        .policy-tooltip-content {
+            min-width: 200px;
+        }
+        
+        .tooltip-title {
+            font-weight: 600;
+            color: #25e2f4;
+            margin-bottom: 8px;
+        }
+        
+        .tooltip-country,
+        .tooltip-date {
+            font-size: 12px;
+            color: #8c9fa2;
+            margin-bottom: 4px;
+        }
+        
+        .tooltip-improvement {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(37, 226, 244, 0.2);
+            font-size: 14px;
+        }
+        
+        .tooltip-improvement .positive {
+            color: #51cf66;
+            font-weight: 600;
+        }
+        
+        .tooltip-improvement .negative {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        
+        .tooltip-hint {
+            font-size: 11px;
+            color: rgba(37, 226, 244, 0.7);
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        /* 로딩 인디케이터 개선 */
+        #loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(37, 226, 244, 0.3);
+            border-top-color: #25e2f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            color: #25e2f4;
+            font-size: 14px;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25e2f4",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#102122",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+
+        #globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #000005 0%, #0a0e1a 100%);
+        }
+
+        #globe-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 51px;
+            height: 31px;
+            cursor: pointer;
+            border-radius: 9999px;
+            border: none;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 2px;
+            transition: background-color 0.3s, justify-content 0.3s;
+        }
+
+        .toggle-switch.checked {
+            background-color: #25e2f4;
+            justify-content: flex-end;
+        }
+
+        .toggle-knob {
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;
+        }
+
+        .toggle-switch input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .policy-card {
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .news-item {
+            transition: all 0.2s;
+        }
+
+        .news-item:hover {
+            transform: translateX(4px);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom Scrollbar for Policy Card */
+        #policy-card::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #policy-card::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        #policy-card::-webkit-scrollbar-thumb {
+            background: rgba(37, 226, 244, 0.3);
+            border-radius: 10px;
+        }
+
+        #policy-card::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 226, 244, 0.5);
+        }
+
+        /* Firefox scrollbar */
+        #policy-card {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(37, 226, 244, 0.5) rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ensure content stays within card boundaries */
+        #policy-card * {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        #policy-card canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        /* Control panel scrollbar */
+        .control-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: rgba(37, 226, 244, 0.3);
+            border-radius: 10px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 226, 244, 0.5);
+        }
+
+        /* Card animations */
+        #policy-card {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            
+            /* 🆕 향상된 스타일 */
+            background: linear-gradient(135deg, rgba(16, 33, 34, 0.7) 0%, rgba(20, 45, 50, 0.8) 100%) !important;
+            border: 2px solid rgba(37, 226, 244, 0.3) !important;
+            box-shadow: 0 8px 32px rgba(37, 226, 244, 0.15), 
+                        inset 0 0 20px rgba(37, 226, 244, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        #policy-card[style*="display: block"],
+        #policy-card.show {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+            box-shadow: 0 8px 32px rgba(37, 226, 244, 0.3), 
+                        inset 0 0 20px rgba(37, 226, 244, 0.1) !important;
+        }
+        
+        /* 🆕 Policy 패널 헤더 강조 */
+        #policy-card .flex.items-start.justify-between {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(37, 226, 244, 0.2);
+        }
+        
+        #policy-card h3 {
+            background: linear-gradient(135deg, #25e2f4, #0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(37, 226, 244, 0.3);
+        }
+        
+        /* 🆕 정책 이름 강조 */
+        #policy-name {
+            font-size: 1.25rem;
+            background: linear-gradient(90deg, #00ff88, #00dd66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+        
+        /* 🆕 정책 설명 스타일 */
+        #policy-desc {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+        }
+        
+        /* 🆕 AQI 상태 박스 개선 */
+        #policy-card .grid.grid-cols-2 > div {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(37, 226, 244, 0.1) 100%);
+            border: 1.5px solid rgba(37, 226, 244, 0.3);
+            box-shadow: 0 4px 12px rgba(37, 226, 244, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        #policy-card .grid.grid-cols-2 > div:hover {
+            border-color: rgba(37, 226, 244, 0.6);
+            box-shadow: 0 8px 16px rgba(37, 226, 244, 0.2);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(37, 226, 244, 0.15) 100%);
+        }
+        
+        #policy-aqi, #policy-pm25 {
+            font-weight: 900;
+            font-size: 1.75rem;
+            background: linear-gradient(90deg, #00ff88, #25e2f4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 🆕 정책 섹션 박스 */
+        #policy-card .bg-black\/20.rounded-lg.p-4 {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%) !important;
+            border: 1.5px solid rgba(37, 226, 244, 0.2) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        #policy-card .bg-black\/20.rounded-lg.p-4:hover {
+            border-color: rgba(37, 226, 244, 0.4) !important;
+            box-shadow: 0 8px 16px rgba(37, 226, 244, 0.15);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.25) 100%) !important;
+        }
+        
+        /* 🆕 아이콘 강조 */
+        #policy-card .material-symbols-outlined {
+            filter: drop-shadow(0 0 4px rgba(37, 226, 244, 0.5));
+            transition: all 0.3s ease;
+        }
+        
+        #policy-card .bg-black\/20.rounded-lg.p-4:hover .material-symbols-outlined {
+            filter: drop-shadow(0 0 8px rgba(37, 226, 244, 0.8)) brightness(1.2);
+            transform: scale(1.1);
+        }
+
+        /* Tablet and below */
+        @media (max-width: 1024px) {
+            #policy-card {
+                max-width: 360px !important;
+            }
+
+            .control-panel {
+                max-width: 180px !important;
+            }
+        }
+
+        /* Mobile landscape and below */
+        @media (max-width: 768px) {
+            .control-panel {
+                max-width: calc(100% - 2rem) !important;
+                width: calc(100% - 2rem) !important;
+                top: 4.5rem !important;
+                left: 1rem !important;
+                right: 1rem !important;
+                max-height: calc(100vh - 5.5rem) !important;
+            }
+
+            #policy-card {
+                max-width: calc(100% - 2rem) !important;
+                width: calc(100% - 2rem) !important;
+                top: 4.5rem !important;
+                left: 1rem !important;
+                max-height: calc(50vh - 3rem) !important;
+                bottom: auto !important;
+            }
+
+            /* Stack cards vertically on mobile */
+            #policy-card[style*="display: block"] ~ aside.control-panel {
+                top: calc(50vh + 1.5rem) !important;
+                max-height: calc(50vh - 7rem) !important;
+            }
+        }
+
+        /* Small mobile */
+        @media (max-width: 480px) {
+            #policy-card,
+            .control-panel {
+                padding: 0.75rem !important;
+                gap: 0.5rem !important;
+            }
+
+            #policy-card h3,
+            .control-panel h1 {
+                font-size: 0.875rem !important;
+            }
+
+            #policy-card .text-xl,
+            .control-panel .text-lg {
+                font-size: 1rem !important;
+            }
+
+            /* Make touch targets larger */
+            button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Transparent navbar for globe page */
+        .navbar-transparent {
+            background: transparent !important;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-bottom: none;
+            z-index: 1000 !important;
+        }
+
+        /* Transparent navbar menu for mobile */
+        @media (max-width: 768px) {
+            .navbar-transparent .navbar-menu {
+                background: rgba(16, 33, 34, 0.95) !important;
+                backdrop-filter: saturate(180%) blur(20px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Mobile Policy Explorer Toggle */
+        @media (max-width: 768px) {
+            .control-panel {
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .control-panel.active {
+                transform: translateX(0);
+            }
+        }
+
+        /* Floating Toggle Button */
+        #policy-explorer-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(37, 226, 244, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+
+        #policy-explorer-toggle:hover {
+            background: rgba(37, 226, 244, 1);
+            transform: scale(1.1);
+        }
+
+        #policy-explorer-toggle .material-symbols-outlined {
+            font-size: 28px;
+            color: white;
+        }
+
+        /* 🆕 Policy Markers on Globe */
+        .policy-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            filter: drop-shadow(0 0 4px rgba(37, 226, 244, 0.6));
+        }
+
+        .policy-marker:hover {
+            transform: translate(-50%, -50%) scale(1.4);
+            filter: drop-shadow(0 0 12px rgba(37, 226, 244, 1)) brightness(1.3);
+            z-index: 10;
+        }
+
+        /* Pulse animation for policy markers */
+        @keyframes policyPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 226, 244, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(37, 226, 244, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 226, 244, 0);
+            }
+        }
+
+        .policy-marker.active {
+            animation: policyPulse 2s infinite;
+        }
+
+        /* Policy info tooltip */
+        .policy-tooltip {
+            position: absolute;
+            background: rgba(16, 33, 34, 0.95);
+            border: 1px solid rgba(37, 226, 244, 0.5);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: white;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transform: translate(-50%, -100%);
+            margin-top: -8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .policy-marker:hover .policy-tooltip {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            #policy-explorer-toggle {
+                display: flex;
+            }
+        }
+    </style>
+
+    <!-- Enhanced Globe Visualization Modules -->
+    <script type="module">
+        // Import enhanced visualization modules
+        import GlobeStationsVisualizer from './js/globe-stations-visualizer.js';
+        import PolicyImpactVisualizer from './js/policy-impact-visualizer.js';
+        import GlobeIntegration from './js/globe-integration.js';
+        import EnhancedPolicyPanel from './js/enhanced-policy-panel.js';
+        
+        // Make globally available
+        window.GlobeStationsVisualizer = GlobeStationsVisualizer;
+        window.PolicyImpactVisualizer = PolicyImpactVisualizer;
+        window.GlobeIntegration = GlobeIntegration;
+        window.EnhancedPolicyPanel = EnhancedPolicyPanel;
+        
+        console.log('✅ Enhanced visualization modules loaded');
+    </script>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark">
+    <!-- Dark Mode Toggle Button -->
+    <div class="theme-toggle-container">
+        <div class="toggle-cont">
+            <input class="toggle-input" id="theme-toggle" name="toggle" type="checkbox" />
+            <label class="toggle-label" for="theme-toggle">
+                <div class="cont-icon">
+                    <span style="--sparkle-width: 2; --sparkle-deg: 25; --sparkle-duration: 11" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 100; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 280; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 200; --sparkle-duration: 3" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 30; --sparkle-duration: 20" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 300; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 250; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 210; --sparkle-duration: 8" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 100; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 15; --sparkle-duration: 13" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 75; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 6" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 50; --sparkle-duration: 7" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 320; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 220; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 215; --sparkle-duration: 2" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 135; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 45; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 78; --sparkle-duration: 16" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 89; --sparkle-duration: 19" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 14" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 97; --sparkle-duration: 1" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 174; --sparkle-duration: 10" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 236; --sparkle-duration: 5" class="sparkle"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="icon">
+                        <path d="M0.96233 28.61C1.36043 29.0081 1.96007 29.1255 2.47555 28.8971L10.4256 25.3552C13.2236 24.11 16.4254 24.1425 19.2107 25.4401L27.4152 29.2747C27.476 29.3044 27.5418 29.3023 27.6047 29.32C27.6563 29.3348 27.7079 29.3497 27.761 29.3574C27.843 29.3687 27.9194 29.3758 28 29.3688C28.1273 29.3617 28.2531 29.3405 28.3726 29.2945C28.4447 29.262 28.5162 29.2287 28.5749 29.1842C28.6399 29.1446 28.6993 29.0994 28.7509 29.0477L28.9008 28.8582C28.9468 28.7995 28.9793 28.7274 29.0112 28.656C29.0599 28.5322 29.0811 28.4036 29.0882 28.2734C29.0939 28.1957 29.0868 28.1207 29.0769 28.0415C29.0705 27.9955 29.0585 27.9524 29.0472 27.9072C29.0295 27.8343 29.0302 27.7601 28.9984 27.6901L25.1638 19.4855C23.8592 16.7073 23.8273 13.5048 25.0726 10.7068L28.6145 2.75679C28.8429 2.24131 28.7318 1.63531 28.3337 1.2372C27.9165 0.820011 27.271 0.721743 26.7491 0.9961L19.8357 4.59596C16.8418 6.15442 13.2879 6.18696 10.2615 4.70062L1.80308 0.520214C1.7055 0.474959 1.60722 0.441742 1.50964 0.421943C1.44459 0.409215 1.37882 0.395769 1.3074 0.402133C1.14406 0.395769 0.981436 0.428275 0.818095 0.499692C0.77284 0.519491 0.719805 0.545671 0.67455 0.578198C0.596061 0.617088 0.524653 0.675786 0.4596 0.74084C0.394546 0.805894 0.335843 0.877306 0.296245 0.956502C0.263718 1.00176 0.237561 1.05477 0.217762 1.10003C0.152708 1.24286 0.126545 1.40058 0.120181 1.54978C0.120181 1.61483 0.126527 1.6735 0.132891 1.73219C0.15269 1.85664 0.178881 1.97332 0.237571 2.08434L4.41798 10.5427C5.91139 13.5621 5.8725 17.1238 4.3204 20.1099L0.720514 27.0233C0.440499 27.5536 0.545137 28.1928 0.96233 28.61Z" />
+                    </svg>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Transparent Navigation Bar -->
+    <nav class="navbar navbar-transparent">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">AirLens</a>
+            <button class="navbar-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="globe.html" class="navbar-link navbar-link-active">Globe</a></li>
+                <li><a href="camera.html" class="navbar-link">Camera AI</a></li>
+                <li><a href="research.html" class="navbar-link">Research</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="settings.html" class="navbar-link">
+                    <div class="settings-icon">
+                        <div class="loader-icon"></div>
+                    </div>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="relative flex h-screen w-full flex-col overflow-hidden">
+
+        <!-- 3D Globe Background -->
+        <div id="globe-container">
+            <canvas id="globe-canvas"></canvas>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="absolute inset-0 flex items-center justify-center bg-background-dark/80 backdrop-blur-sm z-50">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <p class="text-white text-lg font-medium">Loading Globe...</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="relative z-20 flex flex-1 pointer-events-none">
+
+            <!-- Left Side - Country Policy Card -->
+            <aside id="policy-card" class="pointer-events-auto fixed top-20 bottom-6 left-6 flex w-full max-w-[480px] flex-col gap-2 rounded-xl bg-gray-900/50 p-5 backdrop-blur-md border border-white/10 overflow-y-auto control-panel max-h-[calc(100vh-104px)] z-30" style="display: none;">
+
+                <!-- Header -->
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span id="policy-flag" class="text-lg leading-none hover:scale-110 transition-transform cursor-pointer">🌍</span>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-semibold text-white leading-tight truncate" id="policy-country">Country</h3>
+                                <p class="text-xs text-white/60 font-normal leading-tight truncate" id="policy-region">Region</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closePolicyCard()"
+                            class="flex-shrink-0 text-white/60 hover:text-white transition-colors ml-2">
+                        <span class="material-symbols-outlined !text-xl">close</span>
+                    </button>
+                </div>
+
+                <!-- Content -->
+
+                    <!-- Tab System (🆕) -->
+                    <div id="policy-tabs" class="policy-tabs-container"></div>
+
+                    <!-- Tab Content Area (🆕) -->
+                    <div id="policy-content" class="policy-content-area"></div>
+                    <div class="mt-3 p-4 bg-black/20 rounded-lg border border-white/10 hover:border-white/20 hover:bg-black/30 transition-all cursor-pointer">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-primary !text-lg">policy</span>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Main Policy</h4>
+                        </div>
+                        <h5 class="text-sm font-bold text-primary mb-2" id="policy-name">Policy Name</h5>
+                        <p class="text-xs text-white/80 mb-3 leading-relaxed" id="policy-desc">Policy description...</p>
+                        <div class="flex items-center gap-2 text-xs text-white/60 hover:text-white/80 transition-colors">
+                            <span class="material-symbols-outlined !text-sm">calendar_today</span>
+                            <span id="policy-date">Implementation date</span>
+                        </div>
+                    </div>
+
+                    <!-- AQI Status -->
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        <div class="bg-black/20 rounded-lg p-2.5 text-center border border-white/10 hover:border-white/20 hover:bg-black/30 transition-all cursor-pointer">
+                            <p class="text-xs text-white/60 mb-0.5 font-medium">Current AQI</p>
+                            <p class="text-xl font-bold" id="policy-aqi">-</p>
+                        </div>
+                        <div class="bg-black/20 rounded-lg p-2.5 text-center border border-white/10 hover:border-white/20 hover:bg-black/30 transition-all cursor-pointer">
+                            <p class="text-xs text-white/60 mb-0.5 font-medium">PM2.5</p>
+                            <p class="text-xl font-bold" id="policy-pm25">-</p>
+                        </div>
+                    </div>
+
+                    <!-- 🆕 Policy Effectiveness -->
+                    <div class="mt-3 p-4 bg-black/20 rounded-lg border border-white/10 hover:border-white/20 hover:bg-black/30 transition-all">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary !text-base">trending_up</span>
+                                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Effectiveness</h4>
+                            </div>
+                            <span class="text-xs font-bold" id="policy-effectiveness-percent" style="color: #00ff88;">-</span>
+                        </div>
+                        
+                        <!-- Effectiveness Bar -->
+                        <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/10">
+                            <div id="policy-effectiveness-bar" class="h-full rounded-full transition-all duration-500" 
+                                 style="width: 0%; background: linear-gradient(90deg, #00ff88, #00dd66);"></div>
+                        </div>
+                        
+                        <!-- Status Text -->
+                        <div class="mt-2 text-xs text-white/60 text-center">
+                            <p id="policy-effectiveness-status">Analyzing policy impact...</p>
+                        </div>
+                    </div>
+
+                    <!-- Policy Impact Analysis -->
+                    <div class="mt-3" id="policy-impact-section" style="display: none;">
+                        <div class="p-4 bg-black/20 rounded-lg border border-white/10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary !text-lg">analytics</span>
+                                <h4 class="text-sm font-bold text-white">Policy Impact</h4>
+                            </div>
+                            <!-- Visual Comparison Chart -->
+                            <div class="mb-3">
+                                <canvas id="policy-impact-chart" style="max-height: 80px;"></canvas>
+                            </div>
+
+                            <!-- Numeric Summary -->
+                            <div class="grid grid-cols-3 gap-3 mb-3">
+                                <div class="text-center">
+                                    <p class="text-sm text-white/60 mb-1">Before</p>
+                                    <p class="text-base font-bold text-white/90" id="impact-before">-</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-white/60 mb-1">After</p>
+                                    <p class="text-base font-bold text-white/90" id="impact-after">-</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-white/60 mb-1">Change</p>
+                                    <p class="text-base font-bold" id="impact-change">-</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-white/60 text-center" id="impact-significance">
+                                Statistical analysis loading...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Policy Timeline -->
+                    <div class="mt-3" id="policy-timeline-section" style="display: none;">
+                        <div class="p-4 bg-black/20 rounded-lg border border-white/10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary !text-lg">timeline</span>
+                                <h4 class="text-sm font-bold text-white">Timeline</h4>
+                            </div>
+                            <canvas id="policy-timeline-chart" style="max-height: 80px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent News -->
+                    <div class="mt-3">
+                        <div class="p-4 bg-black/20 rounded-lg border border-white/10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary !text-lg">newspaper</span>
+                                <h4 class="text-sm font-bold text-white">Recent News</h4>
+                            </div>
+                            <div id="policy-news" class="space-y-2">
+                                <!-- News items will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- View Full Details Button -->
+                <button id="view-more-btn" onclick="openPolicyLink()" class="w-full flex items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 mt-3 bg-primary/20 text-primary text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/30 transition-colors">
+                    <span class="material-symbols-outlined !text-lg">open_in_new</span>
+                    <span class="truncate">View Full Details</span>
+                </button>
+
+            </aside>
+
+            <!-- Right Control Panel -->
+            <aside class="pointer-events-auto fixed top-20 bottom-6 right-6 flex w-full max-w-[200px] flex-col gap-1 rounded-xl bg-gray-900/50 p-2 backdrop-blur-md border border-white/10 overflow-y-auto control-panel max-h-[calc(100vh-104px)] z-30">
+
+                <!-- Header -->
+                <div class="flex flex-col">
+                    <h1 class="text-white text-xs font-semibold leading-tight">Policy Explorer</h1>
+                    <p class="text-white/60 text-[10px] font-normal leading-tight">Explore policies worldwide</p>
+                </div>
+
+                <!-- Global Statistics -->
+                <div class="mt-1 p-1.5 bg-black/20 rounded-lg border border-white/10">
+                    <h4 class="text-[10px] font-bold text-white mb-1">Global Statistics</h4>
+                    <div class="grid grid-cols-2 gap-1">
+                        <div>
+                            <p class="text-[10px] text-white/60">Countries</p>
+                            <p id="stat-countries" class="text-sm font-bold text-primary">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-white/60">Policies</p>
+                            <p id="stat-policies" class="text-sm font-bold text-primary">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-white/60">Regions</p>
+                            <p id="stat-regions" class="text-sm font-bold text-primary">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-white/60">Updates</p>
+                            <p class="text-sm font-bold text-primary">Live</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="flex flex-col gap-1 mt-1">
+                    <label class="flex flex-col h-7 w-full">
+                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                            <div class="text-white/60 flex border-none bg-black/20 items-center justify-center pl-1.5 rounded-l-lg border-r-0">
+                                <span class="material-symbols-outlined !text-sm">search</span>
+                            </div>
+                            <input id="country-search"
+                                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-black/20 focus:border-none h-full placeholder:text-white/60 px-1.5 rounded-l-none border-l-0 pl-1 text-xs font-normal leading-normal"
+                                   placeholder="Search..."
+                                   value=""/>
+                        </div>
+                    </label>
+
+                    <div class="flex gap-1 flex-wrap">
+                        <button id="filter-region" class="flex h-6 shrink-0 items-center justify-center gap-x-0.5 rounded-lg bg-black/20 pl-1.5 pr-1 hover:bg-black/40 transition-colors">
+                            <p class="text-white text-[10px] font-medium leading-normal">Region</p>
+                            <span class="material-symbols-outlined text-white !text-sm">arrow_drop_down</span>
+                        </button>
+                        <button id="filter-policy" class="flex h-6 shrink-0 items-center justify-center gap-x-0.5 rounded-lg bg-black/20 pl-1.5 pr-1 hover:bg-black/40 transition-colors">
+                            <p class="text-white text-[10px] font-medium leading-normal">Type</p>
+                            <span class="material-symbols-outlined text-white !text-sm">arrow_drop_down</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="my-0.5 border-t border-white/10"></div>
+
+                <!-- Visualization Layers -->
+                <div class="flex flex-col gap-0.5">
+                    <div class="flex flex-col mb-0">
+                        <h1 class="text-white text-xs font-semibold leading-tight">Layers</h1>
+                    </div>
+
+                    <!-- Country Borders -->
+                    <label class="flex items-center gap-1.5 bg-transparent px-1.5 min-h-[32px] py-0.5 justify-between cursor-pointer hover:bg-white/5 rounded-lg transition-colors">
+                        <div class="flex items-center gap-1.5">
+                            <div class="text-white flex items-center justify-center rounded-lg bg-black/20 shrink-0 size-6">
+                                <span class="material-symbols-outlined !text-sm">flag</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-white text-[10px] font-medium leading-tight line-clamp-1">Borders</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <div class="toggle-switch checked" id="toggle-borders-switch" style="width: 32px; height: 18px;">
+                                <input type="checkbox" id="toggle-borders" checked>
+                                <div class="toggle-knob" style="width: 14px; height: 14px;"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- PM2.5 Overlay -->
+                    <label class="flex items-center gap-1.5 bg-transparent px-1.5 min-h-[32px] py-0.5 justify-between cursor-pointer hover:bg-white/5 rounded-lg transition-colors">
+                        <div class="flex items-center gap-1.5">
+                            <div class="text-white flex items-center justify-center rounded-lg bg-black/20 shrink-0 size-6">
+                                <span class="material-symbols-outlined !text-sm">location_on</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-white text-[10px] font-medium leading-tight line-clamp-1">Monitoring Stations</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <div class="toggle-switch checked" id="toggle-pm25-switch" style="width: 32px; height: 18px;">
+                                <input type="checkbox" id="toggle-pm25" checked>
+                                <div class="toggle-knob" style="width: 14px; height: 14px;"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Policy Markers -->
+                    <label class="flex items-center gap-1.5 bg-transparent px-1.5 min-h-[32px] py-0.5 justify-between cursor-pointer hover:bg-white/5 rounded-lg transition-colors">
+                        <div class="flex items-center gap-1.5">
+                            <div class="text-white flex items-center justify-center rounded-lg bg-black/20 shrink-0 size-6">
+                                <span class="material-symbols-outlined !text-sm">policy</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-white text-[10px] font-medium leading-tight line-clamp-1">Policies</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <div class="toggle-switch checked" id="toggle-policies-switch" style="width: 32px; height: 18px;">
+                                <input type="checkbox" id="toggle-policies" checked>
+                                <div class="toggle-knob" style="width: 14px; height: 14px;"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Atmospheric Flow -->
+                    <label class="flex items-center gap-1.5 bg-transparent px-1.5 min-h-[32px] py-0.5 justify-between cursor-pointer hover:bg-white/5 rounded-lg transition-colors">
+                        <div class="flex items-center gap-1.5">
+                            <div class="text-white flex items-center justify-center rounded-lg bg-black/20 shrink-0 size-6">
+                                <span class="material-symbols-outlined !text-sm">air</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-white text-[10px] font-medium leading-tight line-clamp-1">Flow</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <div class="toggle-switch" id="toggle-particles-switch" style="width: 32px; height: 18px;">
+                                <input type="checkbox" id="toggle-particles">
+                                <div class="toggle-knob" style="width: 14px; height: 14px;"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="my-0.5 border-t border-white/10"></div>
+
+                <!-- Globe Controls -->
+                <div class="flex flex-col gap-0.5">
+                    <div class="flex flex-col mb-0">
+                        <h1 class="text-white text-xs font-semibold leading-tight">Controls</h1>
+                    </div>
+
+                    <!-- Zoom Controls -->
+                    <div class="flex gap-1">
+                        <button id="reset-view" class="flex flex-1 items-center justify-center gap-0.5 rounded-lg h-7 bg-black/20 hover:bg-black/40 transition-colors">
+                            <span class="material-symbols-outlined text-white !text-sm">refresh</span>
+                            <span class="text-white text-[10px] font-medium">Reset</span>
+                        </button>
+                        <button id="zoom-in" class="flex size-7 items-center justify-center rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
+                            <span class="material-symbols-outlined text-white !text-sm">add</span>
+                        </button>
+                        <button id="zoom-out" class="flex size-7 items-center justify-center rounded-lg bg-black/20 hover:bg-black/40 transition-colors">
+                            <span class="material-symbols-outlined text-white !text-sm">remove</span>
+                        </button>
+                    </div>
+
+                    <!-- Real-time Data Refresh -->
+                    <div class="mt-1">
+                        <button id="refresh-data" class="w-full flex items-center justify-center gap-1 rounded-lg h-8 bg-primary/20 hover:bg-primary/30 transition-colors">
+                            <span class="material-symbols-outlined text-primary !text-base" id="refresh-icon">sync</span>
+                            <span class="text-primary text-xs font-medium">Update Air Quality</span>
+                        </button>
+                        <div id="last-update" class="text-center text-white/40 text-[10px] mt-1">
+                            Click to update
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- Floating Policy Explorer Toggle Button (Mobile Only) -->
+            <button id="policy-explorer-toggle" onclick="togglePolicyExplorer()" aria-label="Toggle Policy Explorer">
+                <span class="material-symbols-outlined">layers</span>
+            </button>
+
+        </main>
+
+        <!-- Help Tooltip -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 pointer-events-none">
+            <div class="bg-gray-900/90 backdrop-blur-md border border-white/10 rounded-lg px-4 py-2 text-sm text-white/80">
+                <span class="material-symbols-outlined !text-base inline-block align-middle mr-2">touch_app</span>
+                Click on markers to explore air quality policies by country
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global variable to store current policy
+        window.currentPolicy = null;
+
+        /**
+         * 정책 링크 열기
+         */
+        function openPolicyLink() {
+            if (window.currentPolicy && window.currentPolicy.url) {
+                const url = window.currentPolicy.url;
+                console.log('🔗 Opening policy link:', url);
+                window.open(url, '_blank');
+            } else {
+                console.warn('⚠️ Policy URL not available');
+            }
+        }
+
+        // Close policy card with animation
+        function closePolicyCard() {
+            const card = document.getElementById('policy-card');
+            card.classList.remove('show');
+            setTimeout(() => {
+                card.style.display = 'none';
+            }, 300); // Match the transition duration
+            
+            // Policy markers 선택 해제 및 마커 컨테이너 정리
+            if (window.policyMarkersManager) {
+                window.policyMarkersManager.deselectMarker();
+            }
+            
+            // Current policy 초기화
+            window.currentPolicy = null;
+        }
+
+        // Toggle Policy Explorer panel (mobile)
+        function togglePolicyExplorer() {
+            const panel = document.querySelector('.control-panel');
+            const button = document.getElementById('policy-explorer-toggle');
+
+            if (panel) {
+                panel.classList.toggle('active');
+
+                // Change icon based on state
+                const icon = button.querySelector('.material-symbols-outlined');
+                if (panel.classList.contains('active')) {
+                    icon.textContent = 'close';
+                } else {
+                    icon.textContent = 'layers';
+                }
+            }
+        }
+
+        // Close panel when clicking outside (mobile)
+        document.addEventListener('click', function(event) {
+            const panel = document.querySelector('.control-panel');
+            const button = document.getElementById('policy-explorer-toggle');
+
+            if (window.innerWidth <= 768 && panel && button) {
+                if (!panel.contains(event.target) && !button.contains(event.target) && panel.classList.contains('active')) {
+                    togglePolicyExplorer();
+                }
+            }
+        });
+
+        /**
+         * Policy 마커 컨테이너 정리 (아이콘 날라다니는 문제 해결)
+         */
+        function cleanupMarkerContainer() {
+            const existingContainer = document.getElementById('policy-markers-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        }
+
+        // 페이지 로드 시 마커 컨테이너 정리
+        document.addEventListener('DOMContentLoaded', () => {
+            cleanupMarkerContainer();
+        });
+    </script>
+    <script src="js/theme-toggle.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/message-utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/air-quality-api.js"></script>
+    <script type="module" src="js/globe.js"></script>
+
+</body>
+</html>

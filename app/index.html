@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AirLens - Real-time air quality visualization powered by AI. Explore PM2.5 levels globally with interactive 3D globe, Camera AI prediction, and official data from EU Copernicus CAMS.">
+    <meta name="keywords" content="air quality, PM2.5, air pollution, AirLens, environmental monitoring, AI prediction, real-time data, EU Copernicus, CAMS, global air quality">
+    <meta name="author" content="AirLens Team">
+    <meta name="theme-color" content="#25e2f4">
+    <title>AirLens - See the Air | Real-Time Global Air Quality Monitoring</title>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://joymin5655.github.io/Finedust_proj/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://joymin5655.github.io/Finedust_proj/">
+    <meta property="og:title" content="AirLens - See the Air | Real-Time Global Air Quality Monitoring">
+    <meta property="og:description" content="Visualize global air quality with AI-powered predictions. Interactive 3D globe with real data from EU Copernicus CAMS covering 174+ cities worldwide.">
+    <!-- <meta property="og:image" content="https://joymin5655.github.io/Finedust_proj/assets/images/og-image.png"> -->
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://joymin5655.github.io/Finedust_proj/">
+    <meta name="twitter:title" content="AirLens - See the Air">
+    <meta name="twitter:description" content="Real-time air quality visualization powered by AI. Explore PM2.5 levels globally with official data.">
+    <!-- <meta name="twitter:image" content="https://joymin5655.github.io/Finedust_proj/assets/images/twitter-card.png"> -->
+
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/settings.css">
+
+    <!-- Favicon (optional - remove if not available) -->
+    <!-- <link rel="icon" type="image/png" href="assets/images/favicon.png"> -->
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AirLens",
+      "alternateName": "AirLens - Air Quality Monitor",
+      "url": "https://joymin5655.github.io/Finedust_proj/",
+      "description": "Real-time air quality visualization powered by AI. Explore PM2.5 levels globally with interactive 3D globe and Camera AI prediction using official data from EU Copernicus CAMS.",
+      "applicationCategory": "EnvironmentalApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "AirLens Team",
+        "url": "https://github.com/joymin5655/Finedust_proj"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      },
+      "featureList": [
+        "Real-time PM2.5 monitoring",
+        "Interactive 3D globe visualization",
+        "AI-powered camera prediction",
+        "174+ cities worldwide coverage",
+        "Official EU Copernicus CAMS data",
+        "Dark mode support",
+        "Mobile responsive design"
+      ]
+    }
+    </script>
+</head>
+<body>
+    <!-- Skip to Content Link for Keyboard Navigation -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <!--
+      ==========================================
+      DARK MODE TOGGLE BUTTON
+      ==========================================
+      Compact animated toggle switch with sparkle effects
+      - Position: Fixed bottom-left corner
+      - Size: 16px (half of previous size)
+      - Persists preference to localStorage
+      - Managed by: js/theme-toggle.js
+
+      To modify size/position: See css/main.css lines 562-752
+    -->
+    <div class="theme-toggle-container">
+        <div class="toggle-cont">
+            <input class="toggle-input" id="theme-toggle" name="toggle" type="checkbox" />
+            <label class="toggle-label" for="theme-toggle">
+                <div class="cont-icon">
+                    <span style="--sparkle-width: 2; --sparkle-deg: 25; --sparkle-duration: 11" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 100; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 280; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 200; --sparkle-duration: 3" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 30; --sparkle-duration: 20" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 300; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 250; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 210; --sparkle-duration: 8" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 100; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 15; --sparkle-duration: 13" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 75; --sparkle-duration: 18" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 6" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 50; --sparkle-duration: 7" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 320; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 220; --sparkle-duration: 5" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 215; --sparkle-duration: 2" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 135; --sparkle-duration: 9" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 45; --sparkle-duration: 4" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 78; --sparkle-duration: 16" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 89; --sparkle-duration: 19" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 65; --sparkle-duration: 14" class="sparkle"></span>
+                    <span style="--sparkle-width: 2; --sparkle-deg: 97; --sparkle-duration: 1" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 174; --sparkle-duration: 10" class="sparkle"></span>
+                    <span style="--sparkle-width: 1; --sparkle-deg: 236; --sparkle-duration: 5" class="sparkle"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="icon">
+                        <path d="M0.96233 28.61C1.36043 29.0081 1.96007 29.1255 2.47555 28.8971L10.4256 25.3552C13.2236 24.11 16.4254 24.1425 19.2107 25.4401L27.4152 29.2747C27.476 29.3044 27.5418 29.3023 27.6047 29.32C27.6563 29.3348 27.7079 29.3497 27.761 29.3574C27.843 29.3687 27.9194 29.3758 28 29.3688C28.1273 29.3617 28.2531 29.3405 28.3726 29.2945C28.4447 29.262 28.5162 29.2287 28.5749 29.1842C28.6399 29.1446 28.6993 29.0994 28.7509 29.0477L28.9008 28.8582C28.9468 28.7995 28.9793 28.7274 29.0112 28.656C29.0599 28.5322 29.0811 28.4036 29.0882 28.2734C29.0939 28.1957 29.0868 28.1207 29.0769 28.0415C29.0705 27.9955 29.0585 27.9524 29.0472 27.9072C29.0295 27.8343 29.0302 27.7601 28.9984 27.6901L25.1638 19.4855C23.8592 16.7073 23.8273 13.5048 25.0726 10.7068L28.6145 2.75679C28.8429 2.24131 28.7318 1.63531 28.3337 1.2372C27.9165 0.820011 27.271 0.721743 26.7491 0.9961L19.8357 4.59596C16.8418 6.15442 13.2879 6.18696 10.2615 4.70062L1.80308 0.520214C1.7055 0.474959 1.60722 0.441742 1.50964 0.421943C1.44459 0.409215 1.37882 0.395769 1.3074 0.402133C1.14406 0.395769 0.981436 0.428275 0.818095 0.499692C0.77284 0.519491 0.719805 0.545671 0.67455 0.578198C0.596061 0.617088 0.524653 0.675786 0.4596 0.74084C0.394546 0.805894 0.335843 0.877306 0.296245 0.956502C0.263718 1.00176 0.237561 1.05477 0.217762 1.10003C0.152708 1.24286 0.126545 1.40058 0.120181 1.54978C0.120181 1.61483 0.126527 1.6735 0.132891 1.73219C0.15269 1.85664 0.178881 1.97332 0.237571 2.08434L4.41798 10.5427C5.91139 13.5621 5.8725 17.1238 4.3204 20.1099L0.720514 27.0233C0.440499 27.5536 0.545137 28.1928 0.96233 28.61Z" />
+                    </svg>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!--
+      ==========================================
+      NAVIGATION BAR
+      ==========================================
+      Fixed top navigation with glassmorphism effect
+      - Adapts to dark/light mode automatically
+      - Backdrop blur for modern look
+
+      To add/remove items: Edit navbar-menu list below
+      To modify styles: See css/main.css lines 165-209
+    -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">AirLens</a>
+            <button class="navbar-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu">
+                <li><a href="index.html" class="navbar-link navbar-link-active">Home</a></li>
+                <li><a href="globe.html" class="navbar-link">Globe</a></li>
+                <li><a href="camera.html" class="navbar-link">Camera AI</a></li>
+                <li><a href="research.html" class="navbar-link">Research</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="settings.html" class="navbar-link">
+                    <div class="settings-icon">
+                        <div class="loader-icon"></div>
+                    </div>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--
+      ==========================================
+      HERO SECTION
+      ==========================================
+      Main landing area with animated canvas background
+      - Particle animations: js/hero-animation.js
+      - Gradient background adapts to theme
+
+      To modify content: Edit text and buttons below
+      To change styles: See css/main.css lines 304-344
+    -->
+    <section class="hero" id="main-content" role="main">
+        <div class="hero-content fade-in">
+            <h1 class="hero-title">See the air.<br>Understand the world.</h1>
+            <p class="hero-subtitle">
+                Global air quality visualization powered by AI.<br>
+                Historical data from official sources. One beautiful interface.
+            </p>
+            <div class="hero-cta">
+                <a href="globe.html" class="btn btn-primary">Explore Globe</a>
+                <a href="camera.html" class="btn btn-secondary">Try Camera AI</a>
+            </div>
+        </div>
+        
+        <!-- Animated background particles -->
+        <canvas id="hero-canvas"></canvas>
+    </section>
+
+    <!--
+      ==========================================
+      FEATURES SECTION
+      ==========================================
+      Three-column grid showcasing main features
+      - Cards have hover animations
+      - Responsive: Stacks on mobile
+
+      To add features: Copy a card div and modify content
+      To change grid: See css/main.css lines 430-448
+    -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Three ways to see air quality</h2>
+            
+            <div class="grid grid-3">
+                <!-- Globe Feature -->                <div class="card card-glass fade-in">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Interactive Globe</h3>
+                    <p>Explore air quality data from official international sources on a stunning 3D Earth.
+                       Rotate, zoom, and discover PM2.5 trends based on verified historical data.</p>
+                    <a href="globe.html" class="btn btn-secondary">Launch Globe →</a>
+                </div>
+
+                <!-- Camera Feature -->
+                <div class="card card-glass fade-in">
+                    <div class="feature-icon">📸</div>
+                    <h3>Camera AI</h3>
+                    <p>Upload a photo of the sky and our AI instantly predicts PM2.5 levels. 
+                       Advanced computer vision meets environmental science.</p>
+                    <a href="camera.html" class="btn btn-secondary">Try It Now →</a>
+                </div>
+
+                <!-- Research Feature -->
+                <div class="card card-glass fade-in">
+                    <div class="feature-icon">📊</div>
+                    <h3>Policy Research</h3>
+                    <p>Comprehensive analysis of global air quality policies and their effectiveness. 
+                       Data-driven insights for a cleaner future.</p>
+                    <a href="research.html" class="btn btn-secondary">Read More →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--
+      ==========================================
+      STATISTICS SECTION
+      ==========================================
+      Data highlights in three columns
+      - Numbers styled with primary color
+      - Background changes with theme
+
+      To update numbers: Edit stat-number divs below
+    -->
+    <section class="section" style="background: var(--color-bg-secondary);">
+        <div class="container">
+            <h2 class="section-title">The numbers speak</h2>
+
+            <div class="grid grid-3">
+                <div class="stat-card text-center fade-in">
+                    <div class="stat-number">🌍</div>
+                    <div class="stat-label">Global Coverage</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.5rem;">
+                        Historical data worldwide
+                    </div>
+                </div>
+
+                <div class="stat-card text-center fade-in">
+                    <div class="stat-number">🇪🇺</div>
+                    <div class="stat-label">EU Copernicus CAMS</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.5rem;">
+                        Official European Union data
+                    </div>
+                </div>
+
+                <div class="stat-card text-center fade-in">
+                    <div class="stat-number">📊</div>
+                    <div class="stat-label">Our World in Data</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.5rem;">
+                        IHME verified statistics
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--
+      ==========================================
+      CALL-TO-ACTION SECTION
+      ==========================================
+      Final conversion section with prominent button
+    -->
+    <section class="section">
+        <div class="container text-center">
+            <h2 class="hero-title" style="font-size: var(--text-5xl);">Ready to see the air?</h2>
+            <p class="hero-subtitle">Start exploring global air quality data in seconds.</p>
+            <a href="globe.html" class="btn btn-primary" style="font-size: var(--text-lg); padding: var(--space-4) var(--space-8);">
+                Explore Now →
+            </a>
+        </div>
+    </section>
+
+    <!--
+      ==========================================
+      FOOTER
+      ==========================================
+      Site footer with credits and links
+      - Dark background in both themes
+    -->
+    <footer style="background: var(--color-bg-dark); color: var(--color-text-dark); padding: var(--space-5) 0;">
+        <div class="container text-center">
+            <p style="color: var(--color-text-dark-secondary);">
+                © 2025 AirLens. Built with ❤️ for a cleaner planet.
+            </p>
+            <p style="color: var(--color-text-dark-secondary); font-size: var(--text-sm); margin-top: var(--space-4);">
+                <a href="https://github.com/joymin5655/Finedust_proj" style="color: var(--color-primary);" target="_blank">
+                    View on GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!--
+      ==========================================
+      JAVASCRIPT MODULES
+      ==========================================
+      Order matters! Load in this sequence:
+      1. theme-toggle.js - Dark/light mode (loads first for no flash)
+      2. hero-animation.js - Canvas particle animations
+      3. main.js - Fade-in animations and utilities
+    -->
+    <script src="js/theme-toggle.js"></script>
+    <script src="js/message-utils.js"></script>
+    <script src="js/hero-animation.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

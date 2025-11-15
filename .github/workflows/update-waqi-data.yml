@@ -1,0 +1,63 @@
+name: Update WAQI Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Verify WAQI Token
+        run: |
+          if [ -z "${{ secrets.WAQI_TOKEN }}" ]; then
+            echo "❌ ERROR: WAQI_TOKEN secret is not configured"
+            echo "Please set WAQI_TOKEN in GitHub Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          echo "✅ WAQI_TOKEN secret found"
+      
+      - name: Install dependencies
+        run: npm install --no-save axios
+      
+      - name: Create data directory
+        run: mkdir -p app/data/waqi
+      
+      - name: Fetch WAQI data
+        env:
+          WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
+        run: |
+          node scripts/fetch-waqi-data.js
+        timeout-minutes: 10
+      
+      - name: Commit and push data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add app/data/waqi/
+          
+          if ! git diff --staged --quiet; then
+            git commit -m "📊 Update WAQI data - $(date +'%Y-%m-%d %H:%M UTC')"
+            git push origin main
+            echo "✅ Changes pushed successfully"
+          else
+            echo "ℹ️  No changes to commit"
+          fi

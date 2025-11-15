@@ -1,0 +1,2 @@
+Placeholder for icon-192.png
+This file should be a 192x192 PNG image

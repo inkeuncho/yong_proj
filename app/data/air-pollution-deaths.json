@@ -1,0 +1,137 @@
+{
+  "metadata": {
+    "source": "Our World in Data / IHME Global Burden of Disease",
+    "description": "Death rates from air pollution (deaths per 100,000)",
+    "lastUpdated": "2025-11-07",
+    "unit": "deaths per 100,000 people"
+  },
+  "countries": [
+    {
+      "name": "China",
+      "code": "CHN",
+      "latitude": 35.8617,
+      "longitude": 104.1954,
+      "data": [
+        { "year": 1990, "totalDeaths": 178.2, "outdoorDeaths": 85.3, "indoorDeaths": 92.9, "pm25Exposure": 82.5 },
+        { "year": 2000, "totalDeaths": 165.4, "outdoorDeaths": 95.1, "indoorDeaths": 70.3, "pm25Exposure": 75.2 },
+        { "year": 2010, "totalDeaths": 142.8, "outdoorDeaths": 98.7, "indoorDeaths": 44.1, "pm25Exposure": 68.4 },
+        { "year": 2019, "totalDeaths": 118.3, "outdoorDeaths": 95.2, "indoorDeaths": 23.1, "pm25Exposure": 52.7 },
+        { "year": 2021, "totalDeaths": 112.5, "outdoorDeaths": 92.8, "indoorDeaths": 19.7, "pm25Exposure": 48.3 }
+      ],
+      "gdpPerCapita": 12556,
+      "population": 1425893465
+    },
+    {
+      "name": "India",
+      "code": "IND",
+      "latitude": 20.5937,
+      "longitude": 78.9629,
+      "data": [
+        { "year": 1990, "totalDeaths": 189.5, "outdoorDeaths": 72.4, "indoorDeaths": 117.1, "pm25Exposure": 68.3 },
+        { "year": 2000, "totalDeaths": 198.7, "outdoorDeaths": 89.2, "indoorDeaths": 109.5, "pm25Exposure": 72.8 },
+        { "year": 2010, "totalDeaths": 215.3, "outdoorDeaths": 112.6, "indoorDeaths": 102.7, "pm25Exposure": 78.5 },
+        { "year": 2019, "totalDeaths": 234.2, "outdoorDeaths": 135.8, "indoorDeaths": 98.4, "pm25Exposure": 83.2 },
+        { "year": 2021, "totalDeaths": 238.6, "outdoorDeaths": 141.2, "indoorDeaths": 97.4, "pm25Exposure": 85.1 }
+      ],
+      "gdpPerCapita": 2256,
+      "population": 1428627663
+    },
+    {
+      "name": "United States",
+      "code": "USA",
+      "latitude": 37.0902,
+      "longitude": -95.7129,
+      "data": [
+        { "year": 1990, "totalDeaths": 28.4, "outdoorDeaths": 26.8, "indoorDeaths": 1.6, "pm25Exposure": 18.2 },
+        { "year": 2000, "totalDeaths": 21.7, "outdoorDeaths": 20.3, "indoorDeaths": 1.4, "pm25Exposure": 14.5 },
+        { "year": 2010, "totalDeaths": 16.2, "outdoorDeaths": 15.1, "indoorDeaths": 1.1, "pm25Exposure": 11.2 },
+        { "year": 2019, "totalDeaths": 12.8, "outdoorDeaths": 11.9, "indoorDeaths": 0.9, "pm25Exposure": 8.9 },
+        { "year": 2021, "totalDeaths": 12.1, "outdoorDeaths": 11.3, "indoorDeaths": 0.8, "pm25Exposure": 8.2 }
+      ],
+      "gdpPerCapita": 76398,
+      "population": 339996563
+    },
+    {
+      "name": "South Korea",
+      "code": "KOR",
+      "latitude": 35.9078,
+      "longitude": 127.7669,
+      "data": [
+        { "year": 1990, "totalDeaths": 45.2, "outdoorDeaths": 42.1, "indoorDeaths": 3.1, "pm25Exposure": 38.5 },
+        { "year": 2000, "totalDeaths": 38.6, "outdoorDeaths": 36.2, "indoorDeaths": 2.4, "pm25Exposure": 32.7 },
+        { "year": 2010, "totalDeaths": 32.1, "outdoorDeaths": 30.5, "indoorDeaths": 1.6, "pm25Exposure": 28.4 },
+        { "year": 2019, "totalDeaths": 28.7, "outdoorDeaths": 27.4, "indoorDeaths": 1.3, "pm25Exposure": 25.9 },
+        { "year": 2021, "totalDeaths": 27.3, "outdoorDeaths": 26.1, "indoorDeaths": 1.2, "pm25Exposure": 24.8 }
+      ],
+      "gdpPerCapita": 34997,
+      "population": 51784059
+    },
+    {
+      "name": "Japan",
+      "code": "JPN",
+      "latitude": 36.2048,
+      "longitude": 138.2529,
+      "data": [
+        { "year": 1990, "totalDeaths": 21.3, "outdoorDeaths": 19.8, "indoorDeaths": 1.5, "pm25Exposure": 22.1 },
+        { "year": 2000, "totalDeaths": 17.4, "outdoorDeaths": 16.2, "indoorDeaths": 1.2, "pm25Exposure": 18.5 },
+        { "year": 2010, "totalDeaths": 14.2, "outdoorDeaths": 13.3, "indoorDeaths": 0.9, "pm25Exposure": 15.2 },
+        { "year": 2019, "totalDeaths": 11.8, "outdoorDeaths": 11.1, "indoorDeaths": 0.7, "pm25Exposure": 12.8 },
+        { "year": 2021, "totalDeaths": 11.2, "outdoorDeaths": 10.6, "indoorDeaths": 0.6, "pm25Exposure": 11.9 }
+      ],
+      "gdpPerCapita": 39312,
+      "population": 123294513
+    },
+    {
+      "name": "Germany",
+      "code": "DEU",
+      "latitude": 51.1657,
+      "longitude": 10.4515,
+      "data": [
+        { "year": 1990, "totalDeaths": 24.5, "outdoorDeaths": 23.1, "indoorDeaths": 1.4, "pm25Exposure": 19.8 },
+        { "year": 2000, "totalDeaths": 18.7, "outdoorDeaths": 17.5, "indoorDeaths": 1.2, "pm25Exposure": 15.3 },
+        { "year": 2010, "totalDeaths": 14.3, "outdoorDeaths": 13.4, "indoorDeaths": 0.9, "pm25Exposure": 12.1 },
+        { "year": 2019, "totalDeaths": 11.2, "outdoorDeaths": 10.5, "indoorDeaths": 0.7, "pm25Exposure": 9.8 },
+        { "year": 2021, "totalDeaths": 10.6, "outdoorDeaths": 9.9, "indoorDeaths": 0.7, "pm25Exposure": 9.2 }
+      ],
+      "gdpPerCapita": 50802,
+      "population": 83294633
+    },
+    {
+      "name": "United Kingdom",
+      "code": "GBR",
+      "latitude": 55.3781,
+      "longitude": -3.4360,
+      "data": [
+        { "year": 1990, "totalDeaths": 22.8, "outdoorDeaths": 21.5, "indoorDeaths": 1.3, "pm25Exposure": 17.2 },
+        { "year": 2000, "totalDeaths": 17.6, "outdoorDeaths": 16.5, "indoorDeaths": 1.1, "pm25Exposure": 13.8 },
+        { "year": 2010, "totalDeaths": 13.4, "outdoorDeaths": 12.6, "indoorDeaths": 0.8, "pm25Exposure": 10.7 },
+        { "year": 2019, "totalDeaths": 10.5, "outdoorDeaths": 9.9, "indoorDeaths": 0.6, "pm25Exposure": 8.5 },
+        { "year": 2021, "totalDeaths": 9.9, "outdoorDeaths": 9.3, "indoorDeaths": 0.6, "pm25Exposure": 7.9 }
+      ],
+      "gdpPerCapita": 46371,
+      "population": 67736802
+    },
+    {
+      "name": "Brazil",
+      "code": "BRA",
+      "latitude": -14.2350,
+      "longitude": -51.9253,
+      "data": [
+        { "year": 1990, "totalDeaths": 52.3, "outdoorDeaths": 28.4, "indoorDeaths": 23.9, "pm25Exposure": 24.5 },
+        { "year": 2000, "totalDeaths": 45.7, "outdoorDeaths": 31.2, "indoorDeaths": 14.5, "pm25Exposure": 22.1 },
+        { "year": 2010, "totalDeaths": 38.2, "outdoorDeaths": 32.8, "indoorDeaths": 5.4, "pm25Exposure": 19.8 },
+        { "year": 2019, "totalDeaths": 33.5, "outdoorDeaths": 31.7, "indoorDeaths": 1.8, "pm25Exposure": 17.3 },
+        { "year": 2021, "totalDeaths": 32.1, "outdoorDeaths": 30.5, "indoorDeaths": 1.6, "pm25Exposure": 16.5 }
+      ],
+      "gdpPerCapita": 8917,
+      "population": 216422446
+    }
+  ],
+  "globalTrends": {
+    "1990": { "totalDeaths": 135.8, "outdoorDeaths": 62.3, "indoorDeaths": 73.5 },
+    "2000": { "totalDeaths": 126.4, "outdoorDeaths": 68.7, "indoorDeaths": 57.7 },
+    "2010": { "totalDeaths": 115.2, "outdoorDeaths": 74.5, "indoorDeaths": 40.7 },
+    "2019": { "totalDeaths": 108.3, "outdoorDeaths": 78.9, "indoorDeaths": 29.4 },
+    "2021": { "totalDeaths": 105.7, "outdoorDeaths": 79.8, "indoorDeaths": 25.9 }
+  }
+}

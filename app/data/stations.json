@@ -1,0 +1,170 @@
+{
+  "metadata": {
+    "source": "WAQI (World Air Quality Index)",
+    "description": "Real-time air quality monitoring stations worldwide",
+    "lastUpdated": "2025-11-07T13:30:00Z",
+    "totalStations": 13,
+    "coverage": "Global - Major Cities"
+  },
+  "stations": [
+    {
+      "id": "seoul_1",
+      "name": "Seoul City Hall",
+      "city": "Seoul",
+      "country": "South Korea",
+      "latitude": 37.5665,
+      "longitude": 126.9780,
+      "pm25": 28.5,
+      "pm10": 45.2,
+      "aqi": 57,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "beijing_1",
+      "name": "Beijing US Embassy",
+      "city": "Beijing",
+      "country": "China",
+      "latitude": 39.9542,
+      "longitude": 116.4074,
+      "pm25": 85.3,
+      "pm10": 120.1,
+      "aqi": 165,
+      "updated": "2025-11-07T13:00:00Z"
+    }
+  ]
+}
+    ,
+    {
+      "id": "shanghai_1",
+      "name": "Shanghai US Consulate",
+      "city": "Shanghai",
+      "country": "China",
+      "latitude": 31.2304,
+      "longitude": 121.4737,
+      "pm25": 72.4,
+      "pm10": 98.5,
+      "aqi": 158,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "tokyo_1",
+      "name": "Tokyo Shinjuku",
+      "city": "Tokyo",
+      "country": "Japan",
+      "latitude": 35.6895,
+      "longitude": 139.6917,
+      "pm25": 18.7,
+      "pm10": 32.4,
+      "aqi": 66,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "delhi_1",
+      "name": "Delhi US Embassy",
+      "city": "New Delhi",
+      "country": "India",
+      "latitude": 28.6139,
+      "longitude": 77.2090,
+      "pm25": 145.2,
+      "pm10": 210.8,
+      "aqi": 195,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "mumbai_1",
+      "name": "Mumbai US Consulate",
+      "city": "Mumbai",
+      "country": "India",
+      "latitude": 19.0760,
+      "longitude": 72.8777,
+      "pm25": 98.3,
+      "pm10": 156.7,
+      "aqi": 172,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "newyork_1",
+      "name": "New York City",
+      "city": "New York",
+      "country": "United States",
+      "latitude": 40.7128,
+      "longitude": -74.0060,
+      "pm25": 12.3,
+      "pm10": 25.6,
+      "aqi": 51,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "losangeles_1",
+      "name": "Los Angeles Downtown",
+      "city": "Los Angeles",
+      "country": "United States",
+      "latitude": 34.0522,
+      "longitude": -118.2437,
+      "pm25": 32.8,
+      "pm10": 54.3,
+      "aqi": 95,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "london_1",
+      "name": "London Westminster",
+      "city": "London",
+      "country": "United Kingdom",
+      "latitude": 51.5074,
+      "longitude": -0.1278,
+      "pm25": 15.2,
+      "pm10": 28.7,
+      "aqi": 57,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "paris_1",
+      "name": "Paris Centre",
+      "city": "Paris",
+      "country": "France",
+      "latitude": 48.8566,
+      "longitude": 2.3522,
+      "pm25": 18.9,
+      "pm10": 34.2,
+      "aqi": 65,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "berlin_1",
+      "name": "Berlin Mitte",
+      "city": "Berlin",
+      "country": "Germany",
+      "latitude": 52.5200,
+      "longitude": 13.4050,
+      "pm25": 14.7,
+      "pm10": 27.3,
+      "aqi": 55,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "singapore_1",
+      "name": "Singapore Central",
+      "city": "Singapore",
+      "country": "Singapore",
+      "latitude": 1.3521,
+      "longitude": 103.8198,
+      "pm25": 22.4,
+      "pm10": 38.9,
+      "aqi": 72,
+      "updated": "2025-11-07T13:00:00Z"
+    },
+    {
+      "id": "sydney_1",
+      "name": "Sydney CBD",
+      "city": "Sydney",
+      "country": "Australia",
+      "latitude": -33.8688,
+      "longitude": 151.2093,
+      "pm25": 8.5,
+      "pm10": 18.2,
+      "aqi": 35,
+      "updated": "2025-11-07T13:00:00Z"
+    }
+  ]
+}
