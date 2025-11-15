@@ -1,0 +1,269 @@
+================================================================================
+                    DEPENDENCY ANALYSIS - EXECUTIVE SUMMARY
+================================================================================
+Project: AirLens (yong_proj)
+Date: November 15, 2025
+Scope: Complete codebase analysis of file dependencies and usage
+
+================================================================================
+CRITICAL FINDINGS
+================================================================================
+
+ISSUE #1: BROKEN CSS REFERENCE (SEVERITY: HIGH)
+  File: globe.html (line 50)
+  Reference: <link rel="stylesheet" href="css/policy-panel-enhanced.css"/>
+  Status: FILE DOES NOT EXIST
+  Impact: 404 error on page load
+  Fix: Remove reference OR create missing file
+
+ISSUE #2: UNUSED CSS FILES (SEVERITY: MEDIUM)  
+  Files:
+    - camera.css (4.4 KB) - Exists but never linked
+    - globe.css (15.4 KB) - Exists but never linked
+  Total Wasted Space: 19.8 KB
+  Fix: Delete or document why they exist
+
+ISSUE #3: DUPLICATE DATA SERVICES (SEVERITY: MEDIUM)
+  Files:
+    - data-service.js (323 lines) - NOT USED
+    - policy-data-service.js (321 lines) - ACTIVELY USED
+  Fix: Delete data-service.js
+
+================================================================================
+QUICK STATISTICS
+================================================================================
+
+TOTAL FILES ANALYZED:        138
+  - HTML:                      8 (100% used)
+  - JavaScript:               23 (65% used, 8 unused)
+  - CSS:                       4 (50% used, 2 unused)
+  - Data (JSON):             82 (87% used, 11 unused)
+  - Markdown:                21 (0% code-referenced)
+
+CODE SIZE:
+  - JavaScript Total:    9,309 lines (77% used, 23% unused)
+  - CSS Total:            52 KB (62% used, 38% unused)
+
+================================================================================
+ACTIVELY USED FILES (KEEP THESE)
+================================================================================
+
+JAVASCRIPT (15 files actively used):
+  - theme-toggle.js          Used in ALL pages
+  - main.js                  Used in ALL pages
+  - message-utils.js         Used in ALL pages
+  - hero-animation.js        Used on home page
+  - config.js                Used on globe & camera pages
+  - air-quality-api.js       Used on globe page
+  - globe.js                 MAIN MODULE for 3D globe (3,754 lines)
+  - camera.js                MAIN MODULE for AI (830 lines)
+  - satellite-api.js         Used on camera page
+  - settings.js              Used on settings page
+  - shared-data-service.js   Service module
+  - policy-data-service.js   Service module
+  - enhanced-marker-system.js Service module
+  - globe-marker-system.js   Service module
+  - globe-enhancement.js     Dynamically imported by globe.js
+
+CSS (2 files actively used):
+  - main.css (20.8 KB)       All pages - PRIMARY STYLES
+  - settings.css (11.0 KB)   All pages - UTILITY STYLES
+
+DATA (71 files actively used):
+  - All 67 country policy files (policy-impact/*)
+  - policies.json
+  - enhanced-policies.json
+  - policy-impact/index.json
+  - pm25/latest.json
+
+================================================================================
+UNUSED/ORPHANED FILES (CANDIDATES FOR REMOVAL)
+================================================================================
+
+JAVASCRIPT (8 files not used):
+  1. config.template.js       - Template only
+  2. globe-new-methods.js     - Reference/guide only
+  3. globe-integration-guide.js - Documentation only
+  4. policy-panel-enhancement.js - Orphaned module
+  5. data-service.js          - Duplicate of policy-data-service.js
+  6. policy-markers.js        - In modules/ but unused
+  7-8. 2 files in enhanced-policy-system/ - Submodules
+
+CSS (2 files not linked):
+  1. camera.css (4.4 KB)
+  2. globe.css (15.4 KB)
+
+DATA (11 files not fetched):
+  - waqi/latest.json
+  - waqi/global-stations.json
+  - waqi/stats.json
+  - waqi/history/2025-11-14.json
+  - waqi/history/2025-11-15.json
+  - air-pollution-deaths.json
+  - pm25-data.json
+  - stations.json
+
+MARKDOWN (20 files - all pure documentation):
+  - All .md files in root are documentation, not code-referenced
+  - Safe to keep for reference
+
+================================================================================
+HTML PAGE STRUCTURE
+================================================================================
+
+index.html (Home)
+  Loads: theme-toggle, message-utils, hero-animation, main
+
+globe.html (3D Globe - MAIN FEATURE)
+  Loads: theme-toggle, main, message-utils, config, air-quality-api, globe.js
+  Fetches: policy data, pm25 data, 67 country policy files
+  External: Three.js, OrbitControls
+
+camera.html (Camera AI - SECONDARY FEATURE)
+  Loads: theme-toggle, main, message-utils, config, satellite-api, camera.js
+  External: TensorFlow.js
+
+settings.html (Configuration)
+  Loads: theme-toggle, message-utils, main, settings.js
+
+about.html, research.html, 404.html (Information)
+  Load: theme-toggle, message-utils, main
+
+================================================================================
+EXTERNAL DEPENDENCIES
+================================================================================
+
+CDN LIBRARIES:
+  - Three.js v0.160.0 (3D graphics)
+  - Chart.js v4.4.0 (data visualization)
+  - TensorFlow.js v4.11.0 (ML predictions)
+  - Tailwind CSS (styling)
+  - Google Fonts (typography)
+
+EXTERNAL APIS:
+  - EU Copernicus CAMS (air quality)
+  - OpenWeather API (optional)
+  - Open-Meteo API (weather)
+  - AQICN API (optional)
+
+================================================================================
+RECOMMENDATIONS BY PRIORITY
+================================================================================
+
+PRIORITY 1: CRITICAL (Fix Immediately)
+  [ ] Fix broken CSS reference in globe.html (line 50)
+      - Either remove line OR create css/policy-panel-enhanced.css
+      - Time: 5 minutes
+
+PRIORITY 2: HIGH (Fix Soon)
+  [ ] Delete/document unused CSS files (camera.css, globe.css)
+      - Time: 10 minutes
+  [ ] Delete duplicate data-service.js
+      - Time: 5 minutes
+  [ ] Fix absolute paths in data-integration-service.js (lines 192, 208)
+      - Change /data/ to relative paths
+      - Time: 5 minutes
+
+PRIORITY 3: MEDIUM (Optimize)
+  [ ] Delete guide files (globe-integration-guide.js, globe-new-methods.js)
+      - Time: 10 minutes
+  [ ] Archive unused data files (waqi/*, history/*)
+      - Time: 15 minutes
+  [ ] Consider splitting globe.js (3,754 lines is very large)
+      - Time: 2-4 hours
+
+PRIORITY 4: LOW (Documentation)
+  [ ] Update README with data file usage information
+  [ ] Add comments explaining unused CSS files
+  [ ] Document why certain files exist
+  [ ] Remove or archive stale markdown files
+      - Time: 20 minutes
+
+================================================================================
+KEY INSIGHTS
+================================================================================
+
+1. GLOBE.JS IS THE CORE
+   - Single 3,754-line module handles all 3D visualization
+   - Imports: THREE.js, shared-data-service, policy-data-service, etc.
+   - Consider code-splitting for maintainability
+
+2. POLICY DATA FULLY UTILIZED
+   - All 67 country policy files are actively fetched
+   - Index.json references all countries
+   - No orphaned policy data
+
+3. LEGACY WAQI DATA PRESENT
+   - waqi/ folder has 6+ files but nothing is fetched
+   - Appears to be legacy data that's no longer used
+   - Safe to delete or archive
+
+4. DOCUMENTATION IS COMPREHENSIVE
+   - 20 markdown files exist but are not code-referenced
+   - Safe to keep for developer reference
+   - Highly organized documentation structure
+
+5. CSS COULD BE CONSOLIDATED
+   - Currently: main.css + settings.css on all pages
+   - Unused: camera.css + globe.css (never linked)
+   - Could consolidate into single main.css
+
+================================================================================
+FILES SUMMARY TABLE
+================================================================================
+
+Component     Total  Used  Unused  % Used  Size
+HTML            8     8      0     100%   -
+JavaScript     23    15      8      65%   9.3 KB
+CSS             4     2      2      50%   52 KB
+Data           82    71     11      87%   -
+Markdown       21     0     21       0%   -
+TOTAL         138   106     32      77%   -
+
+================================================================================
+BROKEN REFERENCE DETAILS
+================================================================================
+
+File: /home/user/yong_proj/app/globe.html
+Line: 50
+Reference: <link rel="stylesheet" href="css/policy-panel-enhanced.css"/>
+
+Related JS File: /home/user/yong_proj/app/js/policy-panel-enhancement.js
+Status: Exists but NOT imported anywhere
+
+Solution Options:
+  1. Remove line 50 from globe.html (simplest)
+  2. Create the CSS file if styles are needed
+  3. Move styles to main.css if they're generic
+  4. Delete policy-panel-enhancement.js if not needed
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+Recommended Order:
+1. Fix globe.html CSS reference (5 min)
+2. Delete data-service.js (5 min)
+3. Fix path issues in data-integration-service.js (5 min)
+4. Delete/document unused CSS (10 min)
+5. Archive unused data (15 min)
+6. Delete guide files (10 min)
+7. Plan globe.js refactoring (varies)
+
+Total Quick Fixes: ~50 minutes
+
+================================================================================
+NOTES
+================================================================================
+
+- All markdown files are pure documentation (not code-referenced)
+- Analysis includes 23 JavaScript files, 4 CSS files, 82 JSON data files
+- No critical security issues found
+- Project structure is well-organized
+- Main concern: unused/duplicate code and missing CSS reference
+
+For detailed analysis, see DEPENDENCY_ANALYSIS.md
+
+================================================================================
+END OF SUMMARY
+================================================================================
