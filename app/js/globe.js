@@ -104,30 +104,53 @@ class PolicyGlobe {
 
   async init() {
     try {
+      console.time('🚀 Total Initialization Time');
+
+      // Phase 1: Scene setup (동기, 빠름)
+      console.time('Phase 1: Scene Setup');
       this.createLights();
       this.createStars();
-      await this.createRealisticEarth();
+      console.timeEnd('Phase 1: Scene Setup');
+
+      // Phase 2: 3D 장면 생성 (병렬로 진행)
+      console.time('Phase 2: Create 3D Elements');
+
+      // 1️⃣ 지구 텍스처 로드 (시간 걸림)
+      const earthPromise = this.createRealisticEarth();
+
+      // 2️⃣ PM2.5 데이터 로드 (동시 진행)
+      const pm25Promise = this.loadPM25Data();
+
+      // 3️⃣ 정책 데이터 로드 (동시 진행)
+      const policiesPromise = this.loadPoliciesData();
+
+      // 모두 동시에 로드
+      await Promise.all([
+        earthPromise,
+        pm25Promise,
+        policiesPromise
+      ]);
+
+      console.timeEnd('Phase 2: Create 3D Elements');
+
+      // Phase 3: 대기, 구름, 마커 시스템 생성 (이제 병렬화 가능)
+      console.time('Phase 3: Atmosphere & Markers');
       this.createAtmosphere();
       this.createClouds();
-      
+
       // 🆕 Enhanced Marker System 초기화
       this.markerSystem = new EnhancedMarkerSystem(this.scene, this.earth);
-      
-      // ✅ 마커 그룹 가시성 활성화
       this.markerSystem.markerGroups.pm25.visible = true;
       this.markerSystem.markerGroups.policies.visible = true;
       console.log('✅ Marker groups visibility enabled');
-      
+
       this.createParticles();
       this.createCountryBorders();
 
-      await this.loadPM25Data();
+      console.timeEnd('Phase 3: Atmosphere & Markers');
 
-      // 🆕 전역 데이터 서비스에 PM2.5 데이터 업데이트 (전체 페이지 연동)
-      this.globalDataService.setStations(this.pm25Data);
-      console.log(`✅ Updated global data service with ${this.pm25Data.size} stations`);
-
-      // 🆕 PM2.5 마커 생성
+      // Phase 4: PM2.5 마커 생성
+      console.time('Phase 4: Create PM2.5 Markers');
       console.log(`📍 Creating PM2.5 markers from ${this.pm25Data.size} stations...`);
       let pm25Count = 0;
       for (const [id, station] of this.pm25Data) {
@@ -145,14 +168,22 @@ class PolicyGlobe {
         }
       }
       console.log(`✅ Created ${pm25Count} PM2.5 markers`);
-      
-      // 🆕 정책 마커 생성
-      const policyMap = await this.loadPoliciesData();
+
+      // Phase 5: 전역 데이터 서비스 업데이트 (이제 데이터가 로드됨)
+      this.globalDataService.setStations(this.pm25Data);
+      console.log(`✅ Updated stations in global service`);
+
+      console.timeEnd('Phase 4: Create PM2.5 Markers');
+
+      // Phase 6: 정책 마커 생성 및 UI 업데이트
+      console.time('Phase 5: Create Policy Markers');
+      const policyMap = this.countryPolicies; // 이미 loadPoliciesData()에서 설정됨
+
       console.log(`📋 Creating policy markers from ${policyMap.size} policies...`);
       let policyCount = 0;
       for (const [country, policy] of policyMap) {
         try {
-          const marker = this.markerSystem.createPolicyMarker({
+          this.markerSystem.createPolicyMarker({
             country: country,
             latitude: policy.latitude || 37.5,
             longitude: policy.longitude || 126.9,
@@ -169,38 +200,31 @@ class PolicyGlobe {
         }
       }
       console.log(`✅ Created ${policyCount} policy markers in total`);
-      console.log(`📊 Marker system status:`, {
-        pm25Markers: this.markerSystem.pm25Markers.size,
-        policyMarkers: this.markerSystem.policyMarkers.size,
-        pm25GroupChildren: this.markerSystem.markerGroups.pm25.children.length,
-        policiesGroupChildren: this.markerSystem.markerGroups.policies.children.length
-      });
 
-      // 🆕 전역 데이터 서비스에 정책 데이터 업데이트 (전체 페이지 연동)
+      // 전역 데이터 서비스에 정책 데이터 업데이트
       this.globalDataService.setPolicies(policyMap);
-      console.log(`✅ Updated global data service with ${policyMap.size} policies`);
+      console.log(`✅ Updated policies in global service`);
 
-      // Load policy impact data from JSON files
+      // 정책 UI 업데이트 (이제 데이터가 완전히 로드됨)
+      this.updatePolicyUI();
+
+      console.timeEnd('Phase 5: Create Policy Markers');
+
+      // Phase 7: 정책 영향 데이터 로드
+      console.time('Phase 6: Load Policy Impact Data');
       this.policyImpactData = await this.loadPolicyImpactData();
       this.mergePolicyData();
+      console.timeEnd('Phase 6: Load Policy Impact Data');
 
-      // Load real-time air quality data
-      // TEMPORARILY DISABLED: OpenAQ API v2 is deprecated (410 Gone)
-      // TODO: Upgrade to OpenAQ API v3 or use alternative data source
-      /*
-      if (this.airQualityAPI) {
-        this.loadRealTimeAirQuality();
-      }
-      */
-      console.log('ℹ️ Real-time API disabled (OpenAQ v2 deprecated). Using static data from JSON files.');
-
+      // Phase 8: 이벤트 리스너 및 구독 설정
+      console.time('Phase 7: Setup Listeners');
       this.setupEventListeners();
       this.setupToggleSwitches();
-
-      // Get user location and highlight their country
       this.getUserLocationAndHighlight();
+      console.timeEnd('Phase 7: Setup Listeners');
 
-      console.log('Policy Globe setup complete');
+      console.log('✅ Policy Globe setup complete');
+      console.timeEnd('🚀 Total Initialization Time');
 
       // Initialize enhanced visualization (1,188 WAQI stations + 68 country policies)
       if (typeof window.GlobeIntegration !== 'undefined') {
@@ -292,15 +316,17 @@ class PolicyGlobe {
       // Use NASA's Blue Marble Next Generation (free, no API key)
       // Optimized: Lower resolution for faster loading
       const earthTexture = await new Promise((resolve, reject) => {
-        // Try multiple sources in parallel
+        // Try multiple sources in optimized order
         const sources = [
-          // Lower resolution version (2K instead of 8K)
-          'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-          'https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg',
+          // Fast CDN - Lowest latency
+          { url: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg', timeout: 5000, name: 'CDN (2K)' },
+          // Backup - NASA high-res (slower but better quality)
+          { url: 'https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg', timeout: 8000, name: 'NASA (8K)' },
         ];
 
         let attempted = 0;
         let maxAttempts = sources.length;
+        let timeoutId;
 
         const tryNextSource = () => {
           if (attempted >= maxAttempts) {
@@ -312,23 +338,33 @@ class PolicyGlobe {
           const source = sources[attempted];
           attempted++;
 
-          console.log(`📥 Loading Earth texture (${attempted}/${maxAttempts}): ${source.substring(0, 50)}...`);
+          console.log(`📥 Loading Earth texture (${attempted}/${maxAttempts}): ${source.name}`);
+
+          // Timeout for this texture load
+          timeoutId = setTimeout(() => {
+            console.warn(`⏱️ Texture loading timeout (${source.timeout}ms), trying next...`);
+            tryNextSource();
+          }, source.timeout);
 
           textureLoader.load(
-            source,
+            source.url,
             (texture) => {
-              console.log('✅ Earth texture loaded successfully');
+              clearTimeout(timeoutId);
+              console.log(`✅ Earth texture loaded: ${source.name}`);
               // Optimize texture
               texture.magFilter = THREE.LinearFilter;
               texture.minFilter = THREE.LinearMipmapLinearFilter;
               resolve(texture);
             },
             (progress) => {
-              const percent = (progress.loaded / progress.total * 100).toFixed(0);
-              console.log(`  Loading: ${percent}%`);
+              if (progress.total > 0) {
+                const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                console.log(`  Loading ${source.name}: ${percent}%`);
+              }
             },
-            () => {
-              console.warn(`⚠️ Failed to load from ${source.substring(0, 50)}..., trying next...`);
+            (error) => {
+              clearTimeout(timeoutId);
+              console.warn(`⚠️ Failed to load ${source.name}: ${error?.message || 'unknown error'}`);
               tryNextSource();
             }
           );
@@ -3688,8 +3724,11 @@ class PolicyGlobe {
       console.log('📋 Loading policy data...');
       const policies = await this.policyDataService.loadAllPolicies();
       console.log(`✅ Loaded ${policies.size} policies`);
-      
-      this.updatePolicyUI();
+
+      // 정책 데이터를 저장 (나중에 사용)
+      this.countryPolicies = policies;
+
+      // updatePolicyUI()는 init()에서 한 번만 호출 (이중 호출 방지)
       return policies;
     } catch (error) {
       console.error('❌ Failed to load policies:', error);

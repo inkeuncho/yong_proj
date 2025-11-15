@@ -7,7 +7,8 @@ import { globalDataService } from './shared-data-service.js';
 
 export class PolicyDataService {
   constructor() {
-    this.baseURL = '/Finedust_proj/app/data';
+    // 상대 경로로 수정 (로컬 환경 호환)
+    this.baseURL = '/data';
     this.cache = new Map();
     this.cacheExpiry = 10 * 60 * 1000; // 10분
     this.lastUpdateTime = new Map();
