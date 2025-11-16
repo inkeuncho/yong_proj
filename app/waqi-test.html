@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAQI API Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        button.secondary {
+            background: #48bb78;
+        }
+
+        button.secondary:hover {
+            background: #38a169;
+        }
+
+        button.danger {
+            background: #f56565;
+        }
+
+        button.danger:hover {
+            background: #e53e3e;
+        }
+
+        .output {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status.info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+
+        .status.warning {
+            background: #feebc8;
+            color: #7c2d12;
+            border: 1px solid #fbd38d;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .token-hint {
+            background: #fffacd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .data-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .data-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 5px;
+        }
+
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 WAQI API Test Suite</h1>
+
+        <!-- Token Configuration -->
+        <div class="test-card">
+            <h2>🔑 Token Configuration</h2>
+            <div class="token-hint">
+                💡 Get your API token from <strong>https://aqicn.org/data-platform/token/</strong>
+                (Free tier: 10,000 requests/day, Demo token: 1,000 requests/day)
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <input type="text" id="tokenInput" placeholder="Enter WAQI API Token or leave blank for demo token">
+                    <button onclick="setToken()" class="secondary">Set Token</button>
+                </div>
+                <div id="tokenStatus"></div>
+            </div>
+        </div>
+
+        <!-- Test 1: City Data -->
+        <div class="test-card">
+            <h2>🏙️ Test 1: Fetch City Data</h2>
+            <div class="test-section">
+                <p style="margin-bottom: 10px;">Enter a city name to fetch air quality data:</p>
+                <div class="input-group">
+                    <input type="text" id="cityInput" placeholder="City name (e.g., Seoul, Beijing, Tokyo)" value="Seoul">
+                    <button onclick="testCityData()">Fetch Data</button>
+                </div>
+                <div id="cityOutput"></div>
+            </div>
+        </div>
+
+        <!-- Test 2: Multiple Cities -->
+        <div class="test-card">
+            <h2>🌆 Test 2: Fetch Multiple Cities</h2>
+            <div class="test-section">
+                <p style="margin-bottom: 10px;">Fetch data for multiple cities simultaneously:</p>
+                <div class="input-group">
+                    <input type="text" id="citiesInput" placeholder="Cities separated by comma" value="Seoul,Beijing,Tokyo,Bangkok,Delhi">
+                    <button onclick="testMultipleCities()">Fetch All</button>
+                </div>
+                <div id="citiesOutput"></div>
+            </div>
+        </div>
+
+        <!-- Test 3: Geo Coordinates -->
+        <div class="test-card">
+            <h2>📍 Test 3: Fetch by Coordinates</h2>
+            <div class="test-section">
+                <p style="margin-bottom: 10px;">Fetch data using latitude and longitude:</p>
+                <div class="input-group">
+                    <input type="text" id="latInput" placeholder="Latitude" value="37.5665">
+                    <input type="text" id="lonInput" placeholder="Longitude" value="126.978">
+                    <button onclick="testGeoData()">Fetch Data</button>
+                </div>
+                <div id="geoOutput"></div>
+            </div>
+        </div>
+
+        <!-- Test 4: Batch Test -->
+        <div class="test-card">
+            <h2>⚡ Test 4: Batch Operations</h2>
+            <div class="test-section">
+                <button onclick="runBatchTest()" style="width: 100%;">Run All Tests</button>
+                <div id="batchOutput"></div>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="test-card">
+            <h2>📊 System Status</h2>
+            <div class="test-section">
+                <button onclick="showStatus()" class="secondary" style="margin-right: 10px;">Check Status</button>
+                <button onclick="clearCache()" class="danger">Clear Cache</button>
+                <div id="statusOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/air-quality-api.js"></script>
+    <script>
+        let airAPI = null;
+
+        // Initialize API
+        function initAPI() {
+            airAPI = new AirQualityAPI();
+        }
+
+        // Set custom token
+        function setToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (token) {
+                airAPI.waqiToken = token;
+                showMessage('tokenStatus', `✅ Token set to: ${token.substring(0, 10)}...`, 'success');
+            } else {
+                airAPI.waqiToken = 'demo';
+                showMessage('tokenStatus', '⚠️ Using demo token (limited to 1000 requests/day)', 'warning');
+            }
+        }
+
+        // Test 1: City Data
+        async function testCityData() {
+            const city = document.getElementById('cityInput').value.trim();
+            if (!city) {
+                showMessage('cityOutput', '❌ Please enter a city name', 'error');
+                return;
+            }
+
+            showMessage('cityOutput', '<div class="loader"></div> Fetching data...', 'info');
+
+            try {
+                const data = await airAPI.fetchCityData(city);
+                if (data) {
+                    displayCityData(data, 'cityOutput');
+                } else {
+                    showMessage('cityOutput', `❌ No data found for ${city}. Check the city name.`, 'error');
+                }
+            } catch (error) {
+                showMessage('cityOutput', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 2: Multiple Cities
+        async function testMultipleCities() {
+            const citiesStr = document.getElementById('citiesInput').value.trim();
+            if (!citiesStr) {
+                showMessage('citiesOutput', '❌ Please enter city names', 'error');
+                return;
+            }
+
+            const cities = citiesStr.split(',').map(c => c.trim()).filter(c => c);
+            showMessage('citiesOutput', '<div class="loader"></div> Fetching data for ' + cities.length + ' cities...', 'info');
+
+            try {
+                const data = await airAPI.fetchMultipleCities(cities);
+                if (data) {
+                    displayMultipleCitiesData(data, 'citiesOutput');
+                } else {
+                    showMessage('citiesOutput', '❌ No data found for these cities', 'error');
+                }
+            } catch (error) {
+                showMessage('citiesOutput', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 3: Geo Data
+        async function testGeoData() {
+            const lat = parseFloat(document.getElementById('latInput').value);
+            const lon = parseFloat(document.getElementById('lonInput').value);
+
+            if (isNaN(lat) || isNaN(lon)) {
+                showMessage('geoOutput', '❌ Please enter valid latitude and longitude', 'error');
+                return;
+            }
+
+            showMessage('geoOutput', '<div class="loader"></div> Fetching data...', 'info');
+
+            try {
+                const data = await airAPI.fetchGeoData(lat, lon);
+                if (data) {
+                    displayCityData(data, 'geoOutput');
+                } else {
+                    showMessage('geoOutput', '❌ No data found for these coordinates', 'error');
+                }
+            } catch (error) {
+                showMessage('geoOutput', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run all tests
+        async function runBatchTest() {
+            showMessage('batchOutput', '<div class="loader"></div> Running batch tests...', 'info');
+
+            try {
+                const results = {
+                    timestamp: new Date().toISOString(),
+                    token: airAPI.waqiToken.substring(0, 10) + '...',
+                    tests: []
+                };
+
+                // Test 1: Single city
+                const seoul = await airAPI.fetchCityData('Seoul');
+                results.tests.push({
+                    name: 'Seoul',
+                    status: seoul ? 'PASS' : 'FAIL',
+                    aqi: seoul?.aqi,
+                    pm25: seoul?.pm25
+                });
+
+                // Test 2: Multiple cities
+                const multi = await airAPI.fetchMultipleCities(['Seoul', 'Beijing', 'Tokyo']);
+                results.tests.push({
+                    name: 'Multiple Cities (3)',
+                    status: multi ? 'PASS' : 'FAIL',
+                    count: multi?.citiesCount,
+                    avgPM25: multi?.avgPM25
+                });
+
+                // Test 3: Coordinates
+                const geo = await airAPI.fetchGeoData(37.5665, 126.978);
+                results.tests.push({
+                    name: 'Geo Coordinates',
+                    status: geo ? 'PASS' : 'FAIL',
+                    pm25: geo?.pm25
+                });
+
+                displayBatchResults(results, 'batchOutput');
+            } catch (error) {
+                showMessage('batchOutput', `❌ Batch test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Show status
+        function showStatus() {
+            const status = {
+                apiInitialized: airAPI !== null,
+                token: airAPI?.waqiToken?.substring(0, 10) + '...',
+                cacheSize: airAPI?.cache?.size || 0,
+                cacheTimeout: '30 minutes'
+            };
+
+            const html = `
+                <div class="status info" style="margin-top: 15px;">
+                    <strong>API Status:</strong><br>
+                    ✅ API Initialized: ${status.apiInitialized}<br>
+                    🔑 Token: ${status.token}<br>
+                    💾 Cache Size: ${status.cacheSize} entries<br>
+                    ⏱️ Cache TTL: ${status.cacheTimeout}
+                </div>
+            `;
+            document.getElementById('statusOutput').innerHTML = html;
+        }
+
+        // Clear cache
+        function clearCache() {
+            if (airAPI) {
+                airAPI.cache.clear();
+                showMessage('statusOutput', '✅ Cache cleared successfully', 'success');
+            }
+        }
+
+        // Display single city data
+        function displayCityData(data, elementId) {
+            const html = `
+                <div class="status success">
+                    ✅ Data fetched successfully
+                </div>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-label">City</div>
+                        <div class="data-value">${data.cityName}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">PM2.5 (μg/m³)</div>
+                        <div class="data-value">${data.pm25 !== null ? data.pm25.toFixed(1) : 'N/A'}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">AQI Index</div>
+                        <div class="data-value">${data.aqi}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">AQI Level</div>
+                        <div class="data-value">${data.aqiLevel}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">PM10 (μg/m³)</div>
+                        <div class="data-value">${data.pm10 !== null ? data.pm10.toFixed(1) : 'N/A'}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Coordinates</div>
+                        <div class="data-value">${data.coordinates.lat?.toFixed(4)}, ${data.coordinates.lon?.toFixed(4)}</div>
+                    </div>
+                </div>
+                <div class="output">
+                    <strong>Full Response:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        // Display multiple cities data
+        function displayMultipleCitiesData(data, elementId) {
+            const cityList = data.cities.map(c => `
+                <div class="data-item">
+                    <div class="data-label">${c.cityName}</div>
+                    <div class="data-value">PM2.5: ${c.pm25?.toFixed(1) || 'N/A'} | AQI: ${c.aqi}</div>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="status success">
+                    ✅ Fetched data for ${data.citiesCount} cities
+                </div>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-label">Cities Count</div>
+                        <div class="data-value">${data.citiesCount}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Average PM2.5</div>
+                        <div class="data-value">${data.avgPM25?.toFixed(1) || 'N/A'}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Max PM2.5</div>
+                        <div class="data-value">${data.maxPM25?.toFixed(1) || 'N/A'}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Min PM2.5</div>
+                        <div class="data-value">${data.minPM25?.toFixed(1) || 'N/A'}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Average AQI</div>
+                        <div class="data-value">${data.avgAQI?.toFixed(1) || 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="data-grid" style="margin-top: 20px;">
+                    ${cityList}
+                </div>
+            `;
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        // Display batch test results
+        function displayBatchResults(results, elementId) {
+            const testRows = results.tests.map(test => `
+                <div style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+                    <strong>${test.name}</strong>: <span style="color: ${test.status === 'PASS' ? '#22863a' : '#cb2431'};">${test.status}</span>
+                    ${test.aqi ? `| AQI: ${test.aqi}` : ''}
+                    ${test.pm25 ? `| PM2.5: ${test.pm25.toFixed(1)}` : ''}
+                    ${test.count ? `| Count: ${test.count}` : ''}
+                    ${test.avgPM25 ? `| Avg PM2.5: ${test.avgPM25.toFixed(1)}` : ''}
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="status success">
+                    ✅ Batch tests completed at ${new Date(results.timestamp).toLocaleTimeString()}
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Results:</strong>
+                    ${testRows}
+                </div>
+                <div class="output" style="margin-top: 15px;">
+                    <strong>Full Results:</strong><br>
+                    <pre>${JSON.stringify(results, null, 2)}</pre>
+                </div>
+            `;
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        // Show message helper
+        function showMessage(elementId, message, type) {
+            const statusClass = type === 'error' ? 'error' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : 'success';
+            const html = `<div class="status ${statusClass}">${message}</div>`;
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initAPI();
+            showStatus();
+        });
+    </script>
+</body>
+</html>
